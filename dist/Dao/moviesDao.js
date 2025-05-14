@@ -39,6 +39,7 @@ export class MovieDAO {
         if (index !== -1) {
             this.movies[index] = updatedMovie;
         }
+        return updatedMovie;
     }
     delete(id) {
         const index = this.movies.findIndex((movie) => movie.id === id);

@@ -38,11 +38,12 @@ export class MovieDAO {
     return movie;
   }
 
-  update(id: number, updatedMovie: Movie): void {
+  update(id: number, updatedMovie: Movie): Movie {
     const index = this.movies.findIndex((movie) => movie.id === id);
     if (index !== -1) {
       this.movies[index] = updatedMovie;
     }
+    return updatedMovie
   }
 
   delete(id: number): void {
