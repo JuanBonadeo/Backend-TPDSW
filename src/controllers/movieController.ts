@@ -1,5 +1,5 @@
 // Agregar validacion de parametros
-import { Movie } from "../clases/Movie.js";
+import { Movie } from "../interfaces/Movie.js";
 import { MovieDAO } from "../Dao/moviesDao.js";
 import { Request, Response } from "express";
 
