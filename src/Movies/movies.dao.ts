@@ -1,4 +1,4 @@
-import { Movie } from "../interfaces/Movie.js";
+import { Movie } from "./movie.interface.js";
 
 const DBProvisoria: Movie[] = [
   {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { router as routerMovies} from './routes/moviesRoutes.js';
+import { router as routerMovies} from './Movies/movies.routes.js';
 
 const app = express();
 
