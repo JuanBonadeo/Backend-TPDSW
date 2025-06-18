@@ -4,4 +4,5 @@ node_modules/
 
 /src/generated/prisma
 /postgres
-/prisma
+.vscode
+
