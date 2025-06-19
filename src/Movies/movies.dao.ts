@@ -14,10 +14,10 @@ export class MovieDAO {
   //   return this.movies.find((movie) => movie.id === id);
   // }
 
-  async add(movie: Movie): Movie {
-    await prisma.movie.add(movie)
-    return movie;
-  }
+  // async add(movie: Movie): Movie {
+  //   await prisma.movie.add(movie)
+  //   return movie;
+  // }
 
   // update(id: number, updatedMovie: Movie): Movie {
   //   const index = this.movies.findIndex((movie) => movie.id === id);
