@@ -1,7 +1,9 @@
 // Agregar validacion de parametros
-import { Movie } from "./movie.interface.js";
+import { Movie } from "@prisma/client";
 import { MovieDAO } from "./movies.dao.js";
 import { Request, Response } from "express";
+import { z } from "zod";
+import { CreateMovieDto } from "./movie.interface.js";
 
 export class MovieController {
   private dao: MovieDAO;
@@ -23,86 +25,95 @@ export class MovieController {
     }
   }
 
-  // getMovieById(req: Request, res: Response) {
-  //   const id = parseInt(req.params.id);
-  //   try {
-  //     const result = this.dao.getById(id);
+  async getMovieById(req: Request, res: Response) {
+    const id = parseInt(req.params.id);
+    try {
+      const result = await this.dao.getById(id);
 
-  //     if (result) {
-  //       res.send({ result });
-  //     } else {
-  //       res.status(404).send({ error: "Película no encontrada" });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al obtener la película:", error);
-  //     res.status(500).send({ error: "Error al obtener la película" });
-  //   }
-  // }
+      if (result) {
+        res.send({ result });
+      } else {
+        res.status(404).send({ error: "Película no encontrada" });
+      }
+    } catch (error) {
+      console.error("Error al obtener la película:", error);
+      res.status(500).send({ error: "Error al obtener la película" });
+    }
+  }
 
-  // addMovie(req: Request, res: Response) {
-  //   const movie: Movie = req.body;
+  async addMovie(req: Request, res: Response) {
+    // const movieSchema = z.object({
+    //   title_movie: z.string().min(1, "El título es obligatorio"),
+    //   duration: z.number().int().positive().optional(),
+    //   description: z.string().optional(),
+    //   releaseDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    //     message: "Fecha de lanzamiento inválida",
+    //   }).optional(),
+    //   rating: z.number().min(0).max(10).optional(),
+    // });
+    try {
+      // const parseResult = movieSchema.safeParse(req.body);
 
-  //   try {
-  //     if (!movie || !movie.title) {
-  //       return res.status(400).send({ error: "Faltan datos de la película" });
-  //     }
-  //     const existingMovie = this.dao.getById(movie.id);
-  //     if (existingMovie) {
-  //       return res.status(400).send({ error: "La película ya existe" });
-  //     }
-  //     const result = this.dao.add(movie);
-  //     res.status(201).send({ result });
-  //   } catch (error) {
-  //     console.error("Error al agregar la película:", error);
-  //     res.status(500).send({ error: "Error al agregar la película" });
-  //   }
-  // }
+      // if (!parseResult.success) {
+      //   return res.status(400).json({
+      //     message: "Datos inválidos",
+      //     errors: parseResult.error.format(),
+      //   });
+      // }
 
-  // updateMovie(req: Request, res: Response) {
-  //   const id: number = parseInt(req.params.id);
-  //   const updatedData: Partial<Movie> = req.body;
+      // const movie = parseResult.data;
 
-  //   try {
-  //     if (!updatedData || Object.keys(updatedData).length === 0) {
-  //       return res
-  //         .status(400)
-  //         .send({ error: "No se enviaron datos para actualizar" });
-  //     }
+      const movie: CreateMovieDto = req.body
+      const newMovie = await this.dao.add(movie);
 
-  //     const existingMovie = this.dao.getById(id);
-  //     if (!existingMovie) {
-  //       return res.status(404).send({ error: "Película no encontrada" });
-  //     }
+      res.status(201).json(newMovie);
+    } catch (error) {
+      res.status(500).json({ message: "Error al crear la película", error });
+    }
+  }
 
-  //     const updatedMovie = { ...existingMovie, ...updatedData };
-  //     const result: Movie = this.dao.update(id, updatedMovie);
+  async updateMovie(req: Request, res: Response) {
+    const id: number = parseInt(req.params.id);
+    const updatedData: Partial<CreateMovieDto> = req.body;
 
-  //     res.status(200).send({ result });
-  //   } catch (error) {
-  //     console.error("Error al actualizar la película:", error);
-  //     res.status(500).send({ error: "Error al actualizar la película" });
-  //   }
-  // }
+    try {
+      if (!updatedData || Object.keys(updatedData).length === 0) {
+        return res
+          .status(400)
+          .send({ error: "No se enviaron datos para actualizar" });
+      }
 
-  // deleteMovie(req: Request, res: Response) {
-  //   const id: number = parseInt(req.params.id);
+      const existingMovie = await this.dao.getById(id);
+      if (!existingMovie) {
+        return res.status(404).send({ error: "Película no encontrada" });
+      }
 
-  //   try {
-  //     const existingMovie = this.dao.getById(id);
-  //     if (!existingMovie) {
-  //       return res.status(404).send({ error: "Película no encontrada" });
-  //     }
-  //     this.dao.delete(id);
-  //     res.status(200).send({ message: `Película eliminada con éxito` });
+      const updatedMovie: Movie = { ...existingMovie, ...updatedData };
+      const result: Movie | null = await this.dao.update(id, updatedMovie);
 
-  //   } catch (error) {
-  //     console.error("Error al eliminar la película:", error);}
-      
-  //   }
-
+      res.status(200).send({ result });
+    } catch (error) {
+      console.error("Error al actualizar la película:", error);
+      res.status(500).send({ error: "Error al actualizar la película" });
+    }
   }
 
 
 
+  
+  async deleteMovie(req: Request, res: Response) {
+    const id: number = parseInt(req.params.id);
 
+    try {
+      const existingMovie = await this.dao.getById(id);
+      if (!existingMovie) {
+        return res.status(404).send({ error: "Película no encontrada" });
+      }
+      await this.dao.delete(id);
+      res.status(200).send({ message: `Película con id ${id} eliminada con éxito` });
 
+    } catch (error) {
+      console.error("Error al eliminar la película:", error);}
+
+    }
+}

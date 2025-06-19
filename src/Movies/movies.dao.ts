@@ -1,5 +1,6 @@
 import prisma from "../db/db.js";
 import { Movie } from "@prisma/client";
+import { CreateMovieDto } from "./movie.interface.js";
 
 
 export class MovieDAO {
@@ -10,28 +11,45 @@ export class MovieDAO {
     return movies
   }
   
-  // getById(id: number): Movie | undefined {
-  //   return this.movies.find((movie) => movie.id === id);
-  // }
+  async getById(id: number): Promise<Movie | null> {
+    const movie = await prisma.movie.findUnique({
+      where: { id_movie: id } 
+    })
+    return movie
+  }
 
-  // async add(movie: Movie): Movie {
-  //   await prisma.movie.add(movie)
-  //   return movie;
-  // }
+  async add(movie: CreateMovieDto): Promise<Movie | null>{
+    const newMovie = await prisma.movie.create({
+      data: {
+        title_movie: movie.title_movie,
+        duration: movie.duration,
+        description: movie.description,
+        rating: movie.rating
+      }
+    })
+    return newMovie
+  }
 
-  // update(id: number, updatedMovie: Movie): Movie {
-  //   const index = this.movies.findIndex((movie) => movie.id === id);
-  //   if (index !== -1) {
-  //     this.movies[index] = updatedMovie;
-  //   }
-  //   return updatedMovie
-  // }
+  async update(id: number, updatedMovie: Movie): Promise<Movie | null>  {
+    const result = await prisma.movie.update({
+      where: { id_movie: id },
+      data: {
+        title_movie: updatedMovie.title_movie,
+        duration: updatedMovie.duration,
+        description: updatedMovie.description,
+        releaseDate: updatedMovie.releaseDate,
+        rating: updatedMovie.rating
+      }
+    })
+    return result
+    
+  }
 
-  // delete(id: number): void {
-  //   const index = this.movies.findIndex((movie) => movie.id === id);
-  //   if (index !== -1) {
-  //     this.movies.splice(index, 1);
-  //   }
-  // }
+  async delete(id: number): Promise< Movie > {
+    const result = await prisma.movie.delete({
+      where: {id_movie: id}
+    })
+    return result
+  }
   
 }

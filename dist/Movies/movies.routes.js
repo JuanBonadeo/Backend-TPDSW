@@ -5,16 +5,16 @@ const controller = new MovieController();
 router.get("/", (req, res) => {
     controller.getAllMovies(req, res);
 });
-// router.get("/:id", (req: Request, res: Response) => {
-//   controller.getMovieById(req, res);
-// });
-// router.post("/", (req: Request, res: Response) => {
-//   controller.addMovie(req, res);
-// });
-// router.put("/:id", (req: Request, res: Response) => {
-//   controller.updateMovie(req, res);
-// });
-// router.delete("/:id", (req: Request, res: Response) => {
-//    controller.deleteMovie(req, res); 
-// });
+router.get("/:id", (req, res) => {
+    controller.getMovieById(req, res);
+});
+router.post("/", (req, res) => {
+    controller.addMovie(req, res);
+});
+router.patch("/:id", (req, res) => {
+    controller.updateMovie(req, res);
+});
+router.delete("/:id", (req, res) => {
+    controller.deleteMovie(req, res);
+});
 //# sourceMappingURL=movies.routes.js.map
