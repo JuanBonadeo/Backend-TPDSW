@@ -2,7 +2,7 @@
 import { Movie } from "@prisma/client";
 import { MovieDAO } from "./movies.dao.js";
 import { Request, Response } from "express";
-import { z } from "zod";
+// import { z } from "zod";
 import { CreateMovieDto } from "./movie.interface.js";
 
 export class MovieController {
@@ -30,10 +30,10 @@ export class MovieController {
     try {
       const result = await this.dao.getById(id);
 
-      if (result) {
-        res.send({ result });
-      } else {
+      if (!result) {
         res.status(404).send({ error: "Película no encontrada" });
+      } else {
+        res.send({ result });
       }
     } catch (error) {
       console.error("Error al obtener la película:", error);
@@ -65,6 +65,9 @@ export class MovieController {
 
       const movie: CreateMovieDto = req.body
       const newMovie = await this.dao.add(movie);
+      if (!newMovie) {
+        return res.status(400).json({ message: "Error al crear la película" });
+      } 
 
       res.status(201).json(newMovie);
     } catch (error) {
@@ -90,7 +93,9 @@ export class MovieController {
 
       const updatedMovie: Movie = { ...existingMovie, ...updatedData };
       const result: Movie | null = await this.dao.update(id, updatedMovie);
-
+      if (!result) {
+        return res.status(400).send({ error: "Error al actualizar la película" });
+      }
       res.status(200).send({ result });
     } catch (error) {
       console.error("Error al actualizar la película:", error);
@@ -109,11 +114,15 @@ export class MovieController {
       if (!existingMovie) {
         return res.status(404).send({ error: "Película no encontrada" });
       }
-      await this.dao.delete(id);
+      const result: Movie | null = await this.dao.delete(id);
+      if (!result) {
+        return res.status(400).send({ error: "Error al eliminar la película" });
+      }
       res.status(200).send({ message: `Película con id ${id} eliminada con éxito` });
 
     } catch (error) {
-      console.error("Error al eliminar la película:", error);}
-
+      console.error("Error al eliminar la película:", error);
+      res.status(500).send({ error: "Error al eliminar la película" });
     }
+  }
 }
