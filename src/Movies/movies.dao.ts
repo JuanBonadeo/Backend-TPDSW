@@ -24,6 +24,7 @@ export class MovieDAO {
         title_movie: movie.title_movie,
         duration: movie.duration,
         description: movie.description,
+        releaseDate: movie.releaseDate,
         rating: movie.rating
       }
     })

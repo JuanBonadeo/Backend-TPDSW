@@ -18,7 +18,7 @@ model Movie {
   title_movie       String
   duration          Int?
   description       String?
-  releaseDate       DateTime?
+  releaseDate       Int?
   rating            Float?
 
   
