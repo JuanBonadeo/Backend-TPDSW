@@ -1,5 +1,6 @@
 import express from 'express';
-import { router as routerMovies} from './Movies/movies.routes.js';
+import { router as routerCategories } from './Categories/category.routes.js';
+import { router as routerMovies} from './Movies/movie.routes.js';
 
 const app = express();
 
@@ -19,3 +20,4 @@ app.listen(PORT, () => {
 });
 
 app.use('/movies', routerMovies);
+app.use('/categories', routerCategories)
