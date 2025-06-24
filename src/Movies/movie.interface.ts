@@ -5,4 +5,5 @@ export interface CreateMovieDto {
   release_date?: number //year
   rating?: number
   id_category: number
+  id_director: number
 }

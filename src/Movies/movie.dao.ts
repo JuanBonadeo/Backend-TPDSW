@@ -25,11 +25,13 @@ export class MovieDAO {
         const newMovie = await prisma.movie.create({
             data: {
                 title: movie.title,
-                duration: movie.duration,
                 description: movie.description,
+                duration: movie.duration,
                 release_date: movie.release_date,
                 rating: movie.rating,
-                id_category: movie.id_category
+
+                id_category: movie.id_category,
+                id_director: movie.id_director
             },
             include: {
                 Category: true // Include the related category information
@@ -43,8 +45,8 @@ export class MovieDAO {
             where: { id_movie: id },
             data: {
                 title: updatedMovie.title,
-                duration: updatedMovie.duration,
                 description: updatedMovie.description,
+                duration: updatedMovie.duration,
                 release_date: updatedMovie.release_date,
                 rating: updatedMovie.rating
             }
