@@ -5,15 +5,18 @@ import { Request, Response } from "express";
 // import { z } from "zod";
 import { CreateMovieDto } from "./movie.interface.js";
 import { CategoryDAO } from "../Categories/category.dao.js";
+import { DirectorDAO } from "../Directors/director.dao.js";
 
 
 export class MovieController {
     private dao: MovieDAO;
     private daoCategory: CategoryDAO;
+    private daoDirector: DirectorDAO;
 
     constructor() {
         this.dao = new MovieDAO();
         this.daoCategory = new CategoryDAO();   //TODO: preguntar a meca si esto rompe con la arquitectura en capas
+        this.daoDirector = new DirectorDAO();
     }
 
     async getAllMovies(req: Request, res: Response) {
@@ -48,7 +51,7 @@ export class MovieController {
     async addMovie(req: Request, res: Response) {
         try {
             const movie: CreateMovieDto = req.body
-            if (!movie || !movie.title || !movie.id_category) {
+            if (!movie || !movie.title || !movie.id_category || !movie.id_director) {
                 return res.status(400).json({ message: "Datos de película incompletos" });
             }
             // valido que exista la categoría
@@ -57,6 +60,15 @@ export class MovieController {
             if (!category) {
                 return res.status(404).json({ message: "Categoría no encontrada" });
             }
+
+            // valido que el director exista
+            const { id_director } = movie;
+            const director = await this.daoDirector.getById(id_director);
+            
+            if (!director) {
+                return res.status(404).json({ message: "Director no encontrado" });
+            }
+
             const newMovie = await this.dao.add(movie);
             if (!newMovie) {
                 return res.status(400).json({ message: "Error al crear la película" });
@@ -86,6 +98,16 @@ export class MovieController {
                     return res.status(404).json({ message: "Categoría no encontrada" });
                 }
             }
+            // valido que el director exista si se envió
+            const { id_director } = updatedData;
+            if (id_director) {
+                const director = await this.daoDirector.getById(id_director);
+                if (!director) {
+                    return res.status(404).json({ message: "Director no encontrado" });
+                }
+            }
+
+
             const existingMovie = await this.dao.getById(id);
             if (!existingMovie) {
                 return res.status(404).send({ error: "Película no encontrada" });
@@ -125,4 +147,6 @@ export class MovieController {
             res.status(500).send({ error: "Error al eliminar la película" });
         }
     }
+
 }
+

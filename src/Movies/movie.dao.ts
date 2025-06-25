@@ -7,7 +7,10 @@ export class MovieDAO {
 
 
     async getAll(): Promise<Movie[] | null> {
-        const movies = await prisma.movie.findMany();
+        const movies = await prisma.movie.findMany({ include: {
+            Category: true,
+            Director: true
+        }});
         return movies
     }
 
@@ -15,7 +18,8 @@ export class MovieDAO {
         const movie = await prisma.movie.findUnique({
             where: { id_movie: id },
             include: {
-                Category: true // Include the related category information
+                Category: true,// Include the related category information
+                Director: true // Include the related director information
             }
         })
         return movie
@@ -34,7 +38,8 @@ export class MovieDAO {
                 id_director: movie.id_director
             },
             include: {
-                Category: true // Include the related category information
+                Category: true,
+                Director: true
             }
         })
         return newMovie
