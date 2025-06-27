@@ -54,7 +54,7 @@ model Actor {
   last_name   String        @db.VarChar(100)
   birth_date  DateTime?     @db.Date
   created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  Movie_Actor Movie_Actor[] @ignore
+  Movie_Actor Movie_Actor[] 
 
   @@index([first_name, last_name])
 }
@@ -76,15 +76,16 @@ model Favorite {
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Movie_Actor {
-  id_movie_actor Int      @id @default(autoincrement())
   id_movie   Int
   id_actor   Int
   role       String?   @db.VarChar(100)
   created_at DateTime? @default(now()) @db.Timestamp(6)
+
   Actor      Actor     @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
   Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([id_movie, id_actor, role])
+  @@id([id_movie, id_actor]) 
+  @@index([role])
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

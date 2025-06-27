@@ -3,13 +3,13 @@
 export interface CreateMovieActorDto {
     id_movie: number;
     id_actor: number;
-    role: string;
+    role: Role;
 }
 
 export interface MovieActorResponse {
     id_movie: number;
     id_actor: number;
-    role?: string;
+    role?: Role;
     created_at?: Date;
     // Relaciones populadas
     Movie?: {
@@ -21,4 +21,9 @@ export interface MovieActorResponse {
         first_name: string;
         last_name: string;
     };
+}
+export enum Role {
+    PROTAGONIST = "Protagonist",
+    SECCONDARY = "Secondary",
+    EXTRA = "Extra",
 }
