@@ -1,6 +1,6 @@
 # To-Do / Roadmap del Proyecto
 
-0. [] Mejorar seed
+0. [x] Mejorar seed
 
 1. [] Validaciones de inputs de data con Zod en todos los controladores
 
