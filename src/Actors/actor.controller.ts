@@ -2,9 +2,10 @@
 import { Actor } from "@prisma/client";
 import { ActorDAO } from "./actor.dao.js";
 import { Request, Response } from "express";
-import { CreateActorDto } from "./actor.interface.js";
+import { actorZodSchema, CreateActorDto } from "./actor.interface.js";
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from "../utils/responseHandler.js";
 
-// import { z } from "zod";
+import { z } from "zod";
 
 
 export class ActorController {
@@ -17,52 +18,68 @@ export class ActorController {
   async getAllActors(req: Request, res: Response) {
     try {
       const result = await this.dao.getAll();
+
       if (!result || result.length === 0) {
-        return res.status(404).send({ error: "No se encontraron actores" });
+        notFoundResponse(res, "No se encontraron actores");
       }
-      res.send({ result });
+      successResponse(res, result, "Actores obtenidos con éxito", 200);
     } catch (error) {
-      console.error("Error al obtener los actores:", error);
-      res.status(500).send({ error: "Error al obtener los actores" });
+      internalServerErrorResponse(res, "Error al obtener los actores", error as any);
     }
   }
 
   async getActorById(req: Request, res: Response) {
     const id = parseInt(req.params.id);
+    const idSchema = z.coerce.number().int().positive();
+    const validation = idSchema.safeParse(id);
+    
+    if (!validation.success) {
+      zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
+    }
+
     try {
       const result = await this.dao.getById(id);
 
       if (!result) {
-        res.status(404).send({ error: "Actor no encontrado" });
-      } else {
-        res.send({ result });
+        notFoundResponse(res, "Actor no encontrado");
       }
+      successResponse(res, result, "Actor obtenido con éxito", 200);
     } catch (error) {
-      console.error("Error al obtener el actor:", error);
-      res.status(500).send({ error: "Error al obtener el actor" });
+      internalServerErrorResponse(res, "Error al obtener el actor", error as any);
     }
   }
 
   async addActor(req: Request, res: Response) {
     const newActor = req.body as CreateActorDto;
-    if (!newActor || !newActor.first_name || !newActor.last_name) {
-      return res.status(400).send({ error: "Datos de actor incompletos" });
+    const validation = actorZodSchema.safeParse(newActor)
+    if (!validation.success) {
+      return zodErrorResponse(res, "Datos de actor inválidos", validation.error.errors);
     }
     try {
       const result = await this.dao.add(newActor);
       if (!result) {
-        return res.status(400).send({ error: "Error al agregar el actor" });
+        notFoundResponse(res, "Error al agregar el actor");
       }
-      res.status(201).send({ result });
+      successResponse(res, result, "Actor agregado correctamente", 201);
     } catch (error) {
-      console.error("Error al agregar el actor:", error);
-      res.status(500).send({ error: "Error al agregar el actor" });
+      internalServerErrorResponse(res, "Error al agregar el actor", error as any);
     }
   }
 
   async updateActor(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const updatedData = req.body as Actor;
+    const idSchema = z.coerce.number().int().positive();
+    const validation = idSchema.safeParse(id);
+    if (!validation.success) {
+      return zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
+    }
+    
+    const dataValidation = actorZodSchema.partial().safeParse(updatedData);
+    if (!dataValidation.success) {
+      return zodErrorResponse(res, "Datos de actor inválidos", dataValidation.error.errors);
+    }
+
     try {
       if (!updatedData || Object.keys(updatedData).length === 0) {
         return res
@@ -72,34 +89,38 @@ export class ActorController {
 
       const existingActor = await this.dao.getById(id);
       if (!existingActor) {
-        return res.status(404).send({ error: "Actor no encontrado" });
+        notFoundResponse(res, "Actor no encontrado");
       }
       const result = await this.dao.update(id, updatedData);
       if (!result) {
-        return res.status(404).send({ error: "Actor no encontrado" });
+        errorResponse(res, "Error al actualizar el actor");
       }
-      res.send({ result, message: "Actor actualizado correctamente" });
+
+      successResponse(res, result, "Actor actualizado correctamente", 200);
     } catch (error) {
-      console.error("Error al actualizar el actor:", error);
-      res.status(500).send({ error: "Error al actualizar el actor" });
+      internalServerErrorResponse(res, "Error al actualizar el actor", error as any);
     }
   }
 
   async deleteActor(req: Request, res: Response) {
     const id = parseInt(req.params.id);
+    const idSchema = z.coerce.number().int().positive();
+    const validation = idSchema.safeParse(id);
+    if (!validation.success) {
+      return zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
+    }
     try {
       const existingActor = await this.dao.getById(id);
       if (!existingActor) {
-        return res.status(404).send({ error: "Actor no encontrado" });
+        notFoundResponse(res, "Actor no encontrado");
       }
       const result = await this.dao.delete(id);
       if (!result) {
-        return res.status(400).send({ error: "Error al eliminar el actor" });
+        errorResponse(res, "Error al eliminar el actor");
       }
-      res.send({ message: "Actor eliminado correctamente" });
+      successResponse(res, { id }, "Actor eliminado correctamente", 204);
     } catch (error) {
-      console.error("Error al eliminar el actor:", error);
-      res.status(500).send({ error: "Error al eliminar el actor" });
+      internalServerErrorResponse(res, "Error al eliminar el actor", error as any);
     }
   }
 
