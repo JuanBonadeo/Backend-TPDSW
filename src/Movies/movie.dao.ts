@@ -1,6 +1,6 @@
 import prisma from "../db/db.js";
 import { Movie } from "@prisma/client";
-import { CreateMovieDto } from "./movie.interface.js";
+import { CreateMovieDto, MovieFilters, movieList } from "./movie.interface.js";
 
 
 export class MovieDAO {
@@ -65,6 +65,24 @@ export class MovieDAO {
             where: { id_movie: id }
         })
         return result
+    }
+
+
+    async listMovies(page: number = 1,take: number = 12, filters: MovieFilters = {} ): Promise<movieList | null> {
+    const where: any = {
+        ...(filters.categoryId && { id_category: filters.categoryId }),
+        ...(filters.directorId && { id_director: filters.directorId }),
+        ...(filters.actorId && { actors: { some: { id_actor: filters.actorId } } }) 
+    };
+
+    const movies = await prisma.movie.findMany({ skip: (page - 1) * take, take, where });
+    const totalMovies = await prisma.movie.count({ where });
+
+    return {
+        currentPage: page,
+        totalPages: Math.ceil(totalMovies / take),
+        movies
+    };
     }
 
 }

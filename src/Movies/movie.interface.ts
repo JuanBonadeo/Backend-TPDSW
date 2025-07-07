@@ -1,3 +1,4 @@
+import { Movie } from "@prisma/client"
 import z from "zod"
 
 export interface CreateMovieDto {
@@ -11,7 +12,16 @@ export interface CreateMovieDto {
   id_movie?: number
 }
 
-
+export interface movieList {
+  currentPage: number,
+  totalPages: number,
+  movies: Movie[]
+}
+export interface MovieFilters {
+  categoryId?: number,
+  directorId?: number,
+  actorId?: number
+}
 export const movieZodSchema = z.object({
         title: z.string().min(1, "El título es obligatorio").max(100, "El título no puede exceder los 100 caracteres"),
         description: z.string().optional(),

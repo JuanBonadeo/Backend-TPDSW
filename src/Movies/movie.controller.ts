@@ -156,4 +156,23 @@ export class MovieController {
       internalServerErrorResponse(res, "Error al eliminar la película", error as any);
     }
   }
+
+  async listMovies(req: Request, res: Response) {
+    const page = parseInt(req.query.page as string) || 1;
+    const take = parseInt(req.query.take as string) || 12;
+    const categoryId = parseInt(req.query.categoryId as string) || 0;
+    const directorId = parseInt(req.query.directorId as string) || 0;
+    const actorId = parseInt(req.query.actorId as string) || 0;
+    const filters = { categoryId, directorId, actorId };
+    try {
+      const result = await this.dao.listMovies(page, take, filters);
+      if (!result) {
+        return notFoundResponse(res, "Películas no encontradas");
+      }
+      successResponse(res, result, "Películas obtenidas con éxito", 200);
+    } catch (error) {
+      internalServerErrorResponse(res, "Error al obtener las películas", error as any);
+    }
+  }
 }
+

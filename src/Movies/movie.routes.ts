@@ -10,6 +10,10 @@ router.get("/", (req: Request, res: Response) => {
   controller.getAllMovies(req, res);
 });
 
+router.get("/search", (req: Request, res: Response) => {
+  controller.listMovies(req, res);
+});
+
 router.get("/:id", (req: Request, res: Response) => {
   controller.getMovieById(req, res);
 });
@@ -25,3 +29,4 @@ router.patch("/:id", (req: Request, res: Response) => {
 router.delete("/:id", (req: Request, res: Response) => {
    controller.deleteMovie(req, res); 
 });
+

@@ -343,7 +343,8 @@ async function main() {
     { first_name: 'Andrew', last_name: 'Garfield' },
     { first_name: 'Saoirse', last_name: 'Ronan' },
     { first_name: 'Laurie', last_name: 'Metcalf' },
-    { first_name: 'Ryan', last_name: 'Reynolds' }
+    { first_name: 'Ryan', last_name: 'Reynolds' },
+    { first_name: 'Guillermo', last_name: 'Francella' }
   ];
 
   const actors = [];
