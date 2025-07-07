@@ -21,14 +21,13 @@ export class MovieActorController {
 
 
     async assignActorToMovie(req: Request, res: Response) {
+        const movieActorData: CreateMovieActorDto = req.body;
+        const validation = movieActorZodSchema.safeParse(movieActorData);
+        if (!validation.success) {
+            zodErrorResponse(res, "Error de validación", validation.error.issues);
+            return;
+        }
         try {
-            const movieActorData: CreateMovieActorDto = req.body;
-            const validation = movieActorZodSchema.safeParse(movieActorData);
-            if (!validation.success) {
-                zodErrorResponse(res, "Error de validación", validation.error.issues);
-                return;
-            }
-
             const movie = await this.movieDao.getById(movieActorData.id_movie);
             if (!movie) {
                 notFoundResponse(res, "Película no encontrada");
@@ -47,8 +46,6 @@ export class MovieActorController {
                 return;
             }
             successResponse(res, result, "Actor asignado a la película exitosamente");
-
-
         } catch (error) {
             internalServerErrorResponse(res, "Error interno del servidor", error as any);
         }
@@ -56,16 +53,15 @@ export class MovieActorController {
 
 
     async getActorsByMovie(req: Request, res: Response) {
+        const movieId = parseInt(req.params.movieId);
+
+        const movieIdSchema = z.coerce.number().int().positive("ID de película inválido");
+        const validation = movieIdSchema.safeParse(movieId);
+        if (!validation.success) {
+            zodErrorResponse(res, "ID de película inválido", validation.error.errors);
+            return;
+        }
         try {
-            const movieId = parseInt(req.params.movieId);
-
-            const movieIdSchema = z.coerce.number().int().positive("ID de película inválido");
-            const validation = movieIdSchema.safeParse(movieId);
-            if (!validation.success) {
-                zodErrorResponse(res, "ID de película inválido", validation.error.errors);
-                return;
-            }
-
             const movie = await this.movieDao.getById(movieId);
             if (!movie) {
                 notFoundResponse(res, "Película no encontrada");
@@ -87,14 +83,14 @@ export class MovieActorController {
 
 
     async getMoviesByActor(req: Request, res: Response) {
+        const actorId = parseInt(req.params.actorId);
+        const actorIdSchema = z.coerce.number().int().positive("ID de actor inválido");
+        const validation = actorIdSchema.safeParse(actorId);
+        if (!validation.success) {
+            zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
+            return;
+        }
         try {
-            const actorId = parseInt(req.params.actorId);
-            const actorIdSchema = z.coerce.number().int().positive("ID de actor inválido");
-            const validation = actorIdSchema.safeParse(actorId);
-            if (!validation.success) {
-                zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
-                return;
-            }
             const actor = await this.actorDao.getById(actorId);
             if (!actor) {
                 notFoundResponse(res, "Actor no encontrado");
@@ -107,30 +103,30 @@ export class MovieActorController {
                 return;
             }
 
-            successResponse(res, { actor: actor.last_name , movies: movies }, "Películas del actor obtenidas exitosamente");
+            successResponse(res, { actor: actor.last_name, movies: movies }, "Películas del actor obtenidas exitosamente");
         } catch (error) {
             internalServerErrorResponse(res, "Error al obtener películas del actor", error as any);
         }
     }
 
+
     async delete(req: Request, res: Response) {
+        const movieId = parseInt(req.params.movieId);
+        const actorId = parseInt(req.params.actorId);
+        const movieIdSchema = z.coerce.number().int().positive("ID de película inválido");
+        const actorIdSchema = z.coerce.number().int().positive("ID de actor inválido");
+        const movieValidation = movieIdSchema.safeParse(movieId);
+        const actorValidation = actorIdSchema.safeParse(actorId);
+    
+        if (!movieValidation.success) {
+            zodErrorResponse(res, "ID Pelicula inválido", movieValidation.error.errors, 400);
+            return;
+        }
+        if (!actorValidation.success) {
+            zodErrorResponse(res, "ID Actor inválido", actorValidation.error.errors, 400);
+            return;
+        }
         try {
-            const movieId = parseInt(req.params.movieId);
-            const actorId = parseInt(req.params.actorId);
-            const movieIdSchema = z.coerce.number().int().positive("ID de película inválido");
-            const actorIdSchema = z.coerce.number().int().positive("ID de actor inválido");
-            const movieValidation = movieIdSchema.safeParse(movieId);
-            const actorValidation = actorIdSchema.safeParse(actorId);
-
-            if (!movieValidation.success) {
-                zodErrorResponse(res, "ID Pelicula inválido", movieValidation.error.errors, 400);
-                return;
-            }
-            if (!actorValidation.success) {
-                zodErrorResponse(res, "ID Actor inválido", actorValidation.error.errors, 400);
-                return;
-            }
-
             const result = await this.dao.delete(movieId, actorId);
             !result && errorResponse(res, "Error al eliminar actor de la película", null, 400);
 
@@ -140,19 +136,20 @@ export class MovieActorController {
         }
     }
 
+
     async updateActorRole(req: Request, res: Response) {
+        const movieId = parseInt(req.body.id_movie);
+        const actorId = parseInt(req.body.id_actor);
+        const role: Role = req.body?.role;
+
+        const data = { id_movie: movieId, id_actor: actorId, role };
+        const validation = movieActorZodSchema.safeParse(data);
+        if (!validation.success) {
+            zodErrorResponse(res, "Error de validación", validation.error.issues);
+            return;
+        }
+
         try {
-            const movieId = parseInt(req.body.id_movie);
-            const actorId = parseInt(req.body.id_actor);
-            const role: Role = req.body?.role;
-
-            const data = { id_movie: movieId, id_actor: actorId, role };
-            const validation = movieActorZodSchema.safeParse(data);
-            if (!validation.success) {
-                zodErrorResponse(res, "Error de validación", validation.error.issues);
-                return;
-            }
-
             const result = await this.dao.updateRole(movieId, actorId, role);
 
             if (!result) {

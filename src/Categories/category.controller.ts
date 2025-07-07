@@ -2,7 +2,9 @@
 import { Category } from "@prisma/client";
 import { CategoryDAO } from "./category.dao.js";
 import { Request, Response } from "express";
-import { CreateCategoryDto } from "./category.interface.js";
+import { categoryZodSchema, CreateCategoryDto } from "./category.interface.js";
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from "../utils/responseHandler.js";
+import z from "zod";
 
 // import { z } from "zod";
 
@@ -18,88 +20,106 @@ export class CategoryController {
     try {
       const result = await this.dao.getAll();
       if (!result || result.length === 0) {
-        return res.status(404).send({ error: "No se encontraron categorias" });
+        notFoundResponse(res, "Categorias no encontradas");
+        return;
       }
-      res.send({ result });
+      successResponse(res, result, "Categorias obtenidas con éxito", 200);
     } catch (error) {
-      console.error("Error al obtener las categorias:", error);
-      res.status(500).send({ error: "Error al obtener las categorias" });
+      internalServerErrorResponse(res, "Error al obtener las categorias", error as any);
     }
   }
 
   async getCategoryById(req: Request, res: Response) {
     const id = parseInt(req.params.id);
+    const idSchema = z.coerce.number().int().positive();
+    const validation = idSchema.safeParse(id);
+    if (!validation.success) {
+      zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
+    }
+
     try {
       const result = await this.dao.getById(id);
 
       if (!result) {
-        res.status(404).send({ error: "Categoria no encontrada" });
-      } else {
-        res.send({ result });
-      }
+        notFoundResponse(res, "Categoria no encontrada");
+        return;
+      } 
+
+      successResponse(res, result, "Categoria obtenida con éxito", 200);
     } catch (error) {
-      console.error("Error al obtener la categoria:", error);
-      res.status(500).send({ error: "Error al obtener la categoria" });
+      internalServerErrorResponse(res, "Error al obtener la categoria", error as any);
     }
   }
 
   async addCategory(req: Request, res: Response) {
     const newCategory = req.body as CreateCategoryDto;
-    if (!newCategory || !newCategory.name) {
-      return res.status(400).send({ error: "Datos de categoria incompletos" });
+    const validation = categoryZodSchema.safeParse(newCategory);
+    if (!validation.success) {
+      zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
+      return;
     }
     try {
       const result = await this.dao.add(newCategory);
       if (!result) {
-        return res.status(400).send({ error: "Error al agregar la categoria" });
+        notFoundResponse(res, "Error al agregar la categoria");
+        return;
       }
-      res.status(201).send({ result });
+
+      successResponse(res, result, "Categoria agregada correctamente", 201);
     } catch (error) {
-      console.error("Error al agregar la categoria:", error);
-      res.status(500).send({ error: "Error al agregar la categoria" });
+      internalServerErrorResponse(res, "Error al agregar la categoria", error as any);
     }
   }
 
   async updateCategory(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const updatedData = req.body as Category;
-    try {
-      if (!updatedData || Object.keys(updatedData).length === 0) {
-        return res
-          .status(400)
-          .send({ error: "No se enviaron datos para actualizar" });
-      }
+    const validation = categoryZodSchema.safeParse(updatedData);
+    if (!validation.success) {
+      zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
+      return;
+    }
 
+    try {
       const existingCategory = await this.dao.getById(id);
       if (!existingCategory) {
-        return res.status(404).send({ error: "Categoria no encontrada" });
+       notFoundResponse(res, "Categoria no encontrada");
+       return;
       }
       const result = await this.dao.update(id, updatedData);
       if (!result) {
-        return res.status(404).send({ error: "Categoria no encontrada" });
+        errorResponse(res, "Error al actualizar la categoria", null, 400);
+        return;
       }
-      res.send({ result, message: "Categoria actualizada correctamente" });
+      successResponse(res, result, "Categoria actualizada correctamente", 201);
     } catch (error) {
-      console.error("Error al actualizar la categoria:", error);
-      res.status(500).send({ error: "Error al actualizar la categoria" });
+      internalServerErrorResponse(res, "Error al actualizar la categoria", error as any);
     }
   }
 
   async deleteCategory(req: Request, res: Response) {
     const id = parseInt(req.params.id);
+    const idSchema = z.coerce.number().int().positive();
+    const validation = idSchema.safeParse(id);
+    if (!validation.success) {
+      zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
+      return;
+    }
+
     try {
       const existingCategory = await this.dao.getById(id);
       if (!existingCategory) {
-        return res.status(404).send({ error: "Categoria no encontrada" });
+        notFoundResponse(res, "Categoria no encontrada");
+        return;
       }
       const result = await this.dao.delete(id);
       if (!result) {
-        return res.status(400).send({ error: "Error al eliminar la categoria" });
+        errorResponse(res, "Error al eliminar la categoria", null, 400);
+        return;
       }
-      res.send({ message: "Categoria eliminada correctamente" });
+      successResponse(res, { message: "Categoria eliminada correctamente" }, "Categoria eliminada con éxito", 200);
     } catch (error) {
-      console.error("Error al eliminar la categoria:", error);
-      res.status(500).send({ error: "Error al eliminar la categoria" });
+      internalServerErrorResponse(res, "Error al eliminar la categoria", error as any);
     }
   }
 
