@@ -45,7 +45,7 @@ export const errorResponse = (res: Response, message: (string ) = 'Error', error
 };
 
 // para repuestas con validacion de zod
-export const zodErrorResponse = (res: Response,message: string = 'Validation error', issues: ZodIssue[],  statusCode: number = 400): Response => {
+export const zodErrorResponse = (res: Response,message: string = 'Validation error', issues: (ZodIssue | null)[] ,  statusCode: number = 400): Response => {
   const response: ErrorResponse = {
     message,
     errors: issues,
