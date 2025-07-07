@@ -20,8 +20,7 @@ export class CategoryController {
     try {
       const result = await this.dao.getAll();
       if (!result || result.length === 0) {
-        notFoundResponse(res, "Categorias no encontradas");
-        return;
+        return notFoundResponse(res, "Categorias no encontradas");
       }
       successResponse(res, result, "Categorias obtenidas con éxito", 200);
     } catch (error) {
@@ -29,20 +28,20 @@ export class CategoryController {
     }
   }
 
+
   async getCategoryById(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const idSchema = z.coerce.number().int().positive();
     const validation = idSchema.safeParse(id);
     if (!validation.success) {
-      zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
+      return zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
     }
 
     try {
       const result = await this.dao.getById(id);
 
       if (!result) {
-        notFoundResponse(res, "Categoria no encontrada");
-        return;
+        return notFoundResponse(res, "Categoria no encontrada");
       } 
 
       successResponse(res, result, "Categoria obtenida con éxito", 200);
@@ -51,18 +50,17 @@ export class CategoryController {
     }
   }
 
+
   async addCategory(req: Request, res: Response) {
     const newCategory = req.body as CreateCategoryDto;
     const validation = categoryZodSchema.safeParse(newCategory);
     if (!validation.success) {
-      zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
-      return;
+      return zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
     }
     try {
       const result = await this.dao.add(newCategory);
       if (!result) {
-        notFoundResponse(res, "Error al agregar la categoria");
-        return;
+        return notFoundResponse(res, "Error al agregar la categoria");
       }
 
       successResponse(res, result, "Categoria agregada correctamente", 201);
@@ -71,25 +69,23 @@ export class CategoryController {
     }
   }
 
+
   async updateCategory(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const updatedData = req.body as Category;
     const validation = categoryZodSchema.safeParse(updatedData);
     if (!validation.success) {
-      zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
-      return;
+      return zodErrorResponse(res, "Datos de categoria inválidos", validation.error.errors);
     }
 
     try {
       const existingCategory = await this.dao.getById(id);
       if (!existingCategory) {
-       notFoundResponse(res, "Categoria no encontrada");
-       return;
+       return notFoundResponse(res, "Categoria no encontrada");
       }
       const result = await this.dao.update(id, updatedData);
       if (!result) {
-        errorResponse(res, "Error al actualizar la categoria", null, 400);
-        return;
+        return errorResponse(res, "Error al actualizar la categoria", null, 400);
       }
       successResponse(res, result, "Categoria actualizada correctamente", 201);
     } catch (error) {
@@ -97,32 +93,28 @@ export class CategoryController {
     }
   }
 
+
   async deleteCategory(req: Request, res: Response) {
     const id = parseInt(req.params.id);
     const idSchema = z.coerce.number().int().positive();
     const validation = idSchema.safeParse(id);
     if (!validation.success) {
-      zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
-      return;
+      return zodErrorResponse(res, "ID de categoria inválido", validation.error.errors);
     }
 
     try {
       const existingCategory = await this.dao.getById(id);
       if (!existingCategory) {
-        notFoundResponse(res, "Categoria no encontrada");
-        return;
+        return notFoundResponse(res, "Categoria no encontrada");
       }
       const result = await this.dao.delete(id);
       if (!result) {
-        errorResponse(res, "Error al eliminar la categoria", null, 400);
-        return;
+        return errorResponse(res, "Error al eliminar la categoria", null, 400);
       }
       successResponse(res, { message: "Categoria eliminada correctamente" }, "Categoria eliminada con éxito", 200);
     } catch (error) {
       internalServerErrorResponse(res, "Error al eliminar la categoria", error as any);
     }
   }
-
-
 
 }

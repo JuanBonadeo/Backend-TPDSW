@@ -15,18 +15,20 @@ export class ActorController {
     this.dao = new ActorDAO();
   }
 
+
   async getAllActors(req: Request, res: Response) {
     try {
       const result = await this.dao.getAll();
 
       if (!result || result.length === 0) {
-        notFoundResponse(res, "No se encontraron actores");
+        return notFoundResponse(res, "No se encontraron actores");
       }
-      successResponse(res, result, "Actores obtenidos con éxito", 200);
+      return successResponse(res, result, "Actores obtenidos con éxito", 200);
     } catch (error) {
       internalServerErrorResponse(res, "Error al obtener los actores", error as any);
     }
   }
+
 
   async getActorById(req: Request, res: Response) {
     const id = parseInt(req.params.id);
@@ -34,20 +36,21 @@ export class ActorController {
     const validation = idSchema.safeParse(id);
     
     if (!validation.success) {
-      zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
+      return zodErrorResponse(res, "ID de actor inválido", validation.error.errors);
     }
 
     try {
       const result = await this.dao.getById(id);
 
       if (!result) {
-        notFoundResponse(res, "Actor no encontrado");
+        return notFoundResponse(res, "Actor no encontrado");
       }
       successResponse(res, result, "Actor obtenido con éxito", 200);
     } catch (error) {
       internalServerErrorResponse(res, "Error al obtener el actor", error as any);
     }
   }
+
 
   async addActor(req: Request, res: Response) {
     const newActor = req.body as CreateActorDto;
@@ -58,13 +61,14 @@ export class ActorController {
     try {
       const result = await this.dao.add(newActor);
       if (!result) {
-        notFoundResponse(res, "Error al agregar el actor");
+        return notFoundResponse(res, "Error al agregar el actor");
       }
       successResponse(res, result, "Actor agregado correctamente", 201);
     } catch (error) {
       internalServerErrorResponse(res, "Error al agregar el actor", error as any);
     }
   }
+
 
   async updateActor(req: Request, res: Response) {
     const id = parseInt(req.params.id);
@@ -81,19 +85,13 @@ export class ActorController {
     }
 
     try {
-      if (!updatedData || Object.keys(updatedData).length === 0) {
-        return res
-          .status(400)
-          .send({ error: "No se enviaron datos para actualizar" });
-      }
-
       const existingActor = await this.dao.getById(id);
       if (!existingActor) {
-        notFoundResponse(res, "Actor no encontrado");
+        return notFoundResponse(res, "Actor no encontrado");
       }
       const result = await this.dao.update(id, updatedData);
       if (!result) {
-        errorResponse(res, "Error al actualizar el actor");
+        return errorResponse(res, "Error al actualizar el actor");
       }
 
       successResponse(res, result, "Actor actualizado correctamente", 200);
@@ -101,6 +99,7 @@ export class ActorController {
       internalServerErrorResponse(res, "Error al actualizar el actor", error as any);
     }
   }
+
 
   async deleteActor(req: Request, res: Response) {
     const id = parseInt(req.params.id);
@@ -112,18 +111,17 @@ export class ActorController {
     try {
       const existingActor = await this.dao.getById(id);
       if (!existingActor) {
-        notFoundResponse(res, "Actor no encontrado");
+        return notFoundResponse(res, "Actor no encontrado");
       }
       const result = await this.dao.delete(id);
       if (!result) {
-        errorResponse(res, "Error al eliminar el actor");
+        return errorResponse(res, "Error al eliminar el actor");
       }
       successResponse(res, { id }, "Actor eliminado correctamente", 204);
     } catch (error) {
       internalServerErrorResponse(res, "Error al eliminar el actor", error as any);
     }
   }
-
 
 
 }
