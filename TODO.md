@@ -7,9 +7,9 @@
 2. [x] Normalizar los return en todos los controladores para que tengan la misma estructura:
             { ok: true, message: "string", result: { ... } }  
 
-3. [] Listado de películas filtrado por categoría, o actor, o director
+3. [x] Listado de películas filtrado por categoría, o actor, o director
 
-4. [] Agregar paginación a listado anterior
+4. [x] Agregar paginación a listado anterior
 
 5. [] Hacer la Auth, CRUD de usuarios
 

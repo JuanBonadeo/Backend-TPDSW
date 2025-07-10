@@ -3,7 +3,7 @@ import { Movie } from "@prisma/client";
 import { MovieDAO } from "./movie.dao.js";
 import { Request, Response } from "express";
 import { z } from "zod";
-import { CreateMovieDto, movieZodSchema } from "./movie.interface.js";
+import { CreateMovieDto, movieZodSchema, movieZodSchemaQuery } from "./movie.interface.js";
 import { CategoryDAO } from "../Categories/category.dao.js";
 import { DirectorDAO } from "../Directors/director.dao.js";
 import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from "../utils/responseHandler.js";
@@ -164,6 +164,11 @@ export class MovieController {
     const directorId = parseInt(req.query.directorId as string) || 0;
     const actorId = parseInt(req.query.actorId as string) || 0;
     const filters = { categoryId, directorId, actorId };
+    const validation = movieZodSchemaQuery.safeParse({ page, take, ...filters });
+    if (!validation.success) {
+      return zodErrorResponse(res, "Parámetros de consulta inválidos", validation.error.errors);
+    }
+
     try {
       const result = await this.dao.listMovies(page, take, filters);
       if (!result) {

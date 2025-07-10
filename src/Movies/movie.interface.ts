@@ -42,3 +42,11 @@ export const movieZodSchemaUpdate = z.object({
   id_director: z.number().int().positive("ID de director inválido"),
   id_movie: z.number().int().positive("ID de película inválido"),
 });
+
+export const movieZodSchemaQuery = z.object({
+  page: z.coerce.number().int().positive("El número de página debe ser un entero positivo").default(1),
+  limit: z.coerce.number().int().positive("El límite debe ser un entero positivo").default(10),
+  categoryId: z.coerce.number().int().optional(),
+  directorId: z.coerce.number().int().optional(),
+  actorId: z.coerce.number().int().optional(),
+});
