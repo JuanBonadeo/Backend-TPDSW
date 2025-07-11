@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,27 +9,26 @@ datasource db {
 }
 
 model Movie {
-  id_movie     Int           @id @default(autoincrement())
+  id_movie Int @id @default(autoincrement())
 
-  title        String        @unique(map: "Movie_title_idx") @db.VarChar(200)
-  description  String?       @db.VarChar(1000)
+  title        String  @unique(map: "Movie_title_idx") @db.VarChar(200)
+  description  String? @db.VarChar(1000)
   duration     Int?
   release_date Int?
-  rating       Float?        @default(0)
+  rating       Float?  @default(0)
 
-  id_director  Int
-  id_category  Int
+  id_director Int
+  id_category Int
 
-  created_at   DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at   DateTime?     @default(now()) @db.Timestamp(6)
-  Favorite     Favorite[]    @ignore
-  Movie_Actor  Movie_Actor[] 
-  Review       Review[]
+  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
+  Favorite    Favorite[]    
+  Movie_Actor Movie_Actor[]
+  Review      Review[]
 
-  Category     Category      @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
-  Director     Director      @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
+  Category Category @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
+  Director Director @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
 }
-
 
 model Category {
   id_category Int       @id @default(autoincrement())
@@ -48,47 +48,45 @@ model Director {
 
   @@unique([first_name, last_name], map: "Director_first_name_last_name_idx")
 }
+
 model Actor {
   id_actor    Int           @id @default(autoincrement())
   first_name  String        @db.VarChar(100)
   last_name   String        @db.VarChar(100)
   birth_date  DateTime?     @db.Date
   created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  Movie_Actor Movie_Actor[] 
+  Movie_Actor Movie_Actor[]
 
   @@index([first_name, last_name])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
 model Favorite {
   id_user            Int
   id_movie           Int
-  cached_movie_title String?   @db.VarChar(200)
   created_at         DateTime? @default(now()) @db.Timestamp(6)
   Movie              Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
   User               User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([id_user, id_movie])
-  @@ignore
+  @@id([id_user, id_movie])
+  @@index([id_movie, id_user])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
 model Movie_Actor {
   id_movie   Int
   id_actor   Int
   role       String?   @db.VarChar(100)
   created_at DateTime? @default(now()) @db.Timestamp(6)
 
-  Actor      Actor     @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
-  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  Actor Actor @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
+  Movie Movie @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([id_movie, id_actor]) 
+  @@id([id_movie, id_actor])
   @@index([role])
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
 model Review {
   id_review   Int       @id @default(autoincrement())
   id_user     Int
@@ -103,14 +101,67 @@ model Review {
   @@unique([id_user, id_movie], map: "Review_id_user_id_movie_idx")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+// BETTERAUTH MODELS
 model User {
-  id         Int        @id @default(autoincrement())
-  name       String     @db.VarChar(100)
-  email      String     @unique(map: "User_email_idx") @db.VarChar(255)
-  birth_date DateTime?  @db.Date
-  created_at DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at DateTime?  @default(now()) @db.Timestamp(6)
-  Favorite   Favorite[] @ignore
-  Review     Review[]
+  id            Int        @id @default(autoincrement())
+  name          String     @db.VarChar(100)
+  email         String     @unique(map: "User_email_idx") @db.VarChar(255)
+  birth_date    DateTime?  @db.Date
+  created_at    DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at    DateTime?  @default(now()) @db.Timestamp(6)
+  Favorite      Favorite[] 
+  Review        Review[]
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
