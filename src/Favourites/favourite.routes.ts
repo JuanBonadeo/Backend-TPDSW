@@ -6,14 +6,12 @@ import { FavouriteController } from "./favourite.controller.js";
 export const router = Router();
 const controller = new FavouriteController();
 
-router.post("/", async (req: Request, res: Response) => {
-    controller.createFavourite(req, res)
-});
 
-router.get("/:id_user", async (req: Request, res: Response) => {
-    controller.getFavouritesByUserId(req, res)
-});
+router.post("/", controller.createFavourite.bind(controller));
 
-router.delete("/", async (req: Request, res: Response) => {
-    controller.delete(req, res)
-});
+router.get("/user/:id_user", controller.getFavouritesByUserId.bind(controller));
+
+router.delete("/", controller.delete.bind(controller));
+
+router.put('/toggle', controller.toggleFavourite.bind(controller));
+

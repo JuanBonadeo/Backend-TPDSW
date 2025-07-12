@@ -3,7 +3,7 @@ import { FavouriteDTO } from "./favourite.interface.js";
 
 
 
-export class FavouriteDao {  
+export class FavouriteDAO {  
 
   async getOne(id_user: string, id_movie: number): Promise<FavouriteDTO | null> {
     return prisma.favorite.findFirst({
