@@ -6,12 +6,13 @@ async function main() {
   console.log('🌱 Iniciando seed...');
 
   // Limpiar datos existentes
+  await prisma.favorite.deleteMany();
   await prisma.movie_Actor.deleteMany();
   await prisma.actor.deleteMany();
   await prisma.movie.deleteMany();
   await prisma.director.deleteMany();
   await prisma.category.deleteMany();
-
+  await prisma.user.deleteMany();
   console.log('🗑️  Datos anteriores eliminados');
 
 

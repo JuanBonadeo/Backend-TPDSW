@@ -62,7 +62,7 @@ model Actor {
 
 
 model Favorite {
-  id_user            Int
+  id_user            String
   id_movie           Int
   created_at         DateTime? @default(now()) @db.Timestamp(6)
   Movie              Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
@@ -89,7 +89,7 @@ model Movie_Actor {
 
 model Review {
   id_review   Int       @id @default(autoincrement())
-  id_user     Int
+  id_user String
   id_movie    Int
   score       Int
   comment     String?
@@ -103,7 +103,7 @@ model Review {
 
 // BETTERAUTH MODELS
 model User {
-  id            Int        @id @default(autoincrement())
+  id           String     @id @default(cuid())
   name          String     @db.VarChar(100)
   email         String     @unique(map: "User_email_idx") @db.VarChar(255)
   birth_date    DateTime?  @db.Date
@@ -129,7 +129,7 @@ model Session {
   updatedAt DateTime
   ipAddress String?
   userAgent String?
-  userId    Int
+  userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
@@ -140,7 +140,7 @@ model Account {
   id                    String    @id
   accountId             String
   providerId            String
-  userId                Int
+  userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?

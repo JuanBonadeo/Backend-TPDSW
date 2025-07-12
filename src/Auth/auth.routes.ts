@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Request, Response } from "express";
 import { auth } from "../utils/auth.js";
-import { successResponse } from "../utils/responseHandler.js";
+import { internalServerErrorResponse, successResponse } from "../utils/responseHandler.js";
 
 
 export const router = Router();
@@ -17,8 +17,11 @@ router.post("/sign-up", async (req: Request, res: Response) => {
                 password,
                 name
             },
-            asResponse: true // returns a response object instead of data
         });
+        if (!response) {
+            internalServerErrorResponse(res, "Sign-up failed");
+            return;
+        }
         successResponse(res, response, "Sign-up successful");
     } catch (error) {
         console.error("Error during sign-up:", error);
@@ -34,6 +37,7 @@ router.post("/sign-in", async (req: Request, res: Response) => {
                 email,
                 password
             },
+            returnHeaders: true,
         });
         
         
@@ -43,3 +47,4 @@ router.post("/sign-in", async (req: Request, res: Response) => {
         res.status(500).json({ error: "Sign-in failed" });
     }
 });
+

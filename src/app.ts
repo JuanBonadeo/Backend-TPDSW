@@ -8,7 +8,7 @@ import { router as routerActors } from './Actors/actor.routes.js';
 import { router as routerDirectors } from './Directors/director.routes.js';
 import { router as routerMovieActors } from './Movie-Actor/movie-actor.routes.js';
 import { router as routerAuth} from './Auth/auth.routes.js';
-
+import { router as routerFavourites } from './Favourites/favourite.routes.js';
 
 const app = express();
 app.use(cors({
@@ -36,5 +36,7 @@ app.use('/categories', routerCategories)
 app.use('/actors', routerActors);
 app.use('/directors', routerDirectors);
 app.use('/movie-actors', routerMovieActors);
+app.use('/favourites', routerFavourites);
+
 
 app.use('/auth', routerAuth);
