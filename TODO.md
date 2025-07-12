@@ -13,7 +13,7 @@
 
 5. [] Hacer la Auth, CRUD de usuarios
 
-6. [] CRUD de favoritos
+6. [x] CRUD de favoritos
 
 7. [] CRUD de reseñas
 

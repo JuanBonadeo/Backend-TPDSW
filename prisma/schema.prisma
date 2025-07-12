@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,11 +10,21 @@ datasource db {
 model Movie {
   id_movie Int @id @default(autoincrement())
 
+  // Campos integrados con TMDB
   title        String  @unique(map: "Movie_title_idx") @db.VarChar(200)
-  description  String? @db.VarChar(1000)
-  duration     Int?
-  release_date Int?
-  rating       Float?  @default(0)
+  description  String? @db.VarChar(1000) 
+  duration     Int?    
+  release_date Int?    
+  rating       Float?  @default(0) // vote_average de TMDB (0-10)
+  
+  // Campos adicionales de TMDB
+  tmdb_id      Int?    @unique // ID de TMDB para sincronización
+  poster_path  String? @db.VarChar(500)
+  backdrop_path String? @db.VarChar(500)
+  original_language String? @db.VarChar(10)
+  vote_count   Int?    @default(0)
+  popularity   Float?  @default(0)
+  adult        Boolean @default(false)
 
   id_director Int
   id_category Int
@@ -32,8 +41,9 @@ model Movie {
 
 model Category {
   id_category Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(50)
-  description String?
+  name        String    @unique @db.VarChar(50) // nombre del género de TMDB
+  description String?   // descripción generada
+  tmdb_id     Int?      @unique // ID de género en TMDB para sincronización
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie[]
 }
@@ -42,7 +52,15 @@ model Director {
   id_director Int       @id @default(autoincrement())
   first_name  String    @db.VarChar(100)
   last_name   String    @db.VarChar(100)
-  nationality String?   @db.VarChar(50)
+  nationality String?   @db.VarChar(50) // extraído de place_of_birth
+  
+  // Campos adicionales integrados de TMDB
+  tmdb_id     Int?      @unique // ID de persona en TMDB
+  profile_path String?  @db.VarChar(500)
+  biography   String?   @db.Text
+  birth_date  DateTime? @db.Date
+  birth_place String?   @db.VarChar(200)
+  
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie[]
 
@@ -54,12 +72,19 @@ model Actor {
   first_name  String        @db.VarChar(100)
   last_name   String        @db.VarChar(100)
   birth_date  DateTime?     @db.Date
+  
+  // Campos adicionales integrados de TMDB
+  tmdb_id     Int?          @unique // ID de persona en TMDB
+  profile_path String?      @db.VarChar(500)
+  biography   String?       @db.Text
+  birth_place String?       @db.VarChar(200)
+  gender      Int?          // 1 = femenino, 2 = masculino, 0 = no especificado
+  
   created_at  DateTime?     @default(now()) @db.Timestamp(6)
   Movie_Actor Movie_Actor[]
 
   @@index([first_name, last_name])
 }
-
 
 model Favorite {
   id_user            String
@@ -72,11 +97,12 @@ model Favorite {
   @@index([id_movie, id_user])
 }
 
-
 model Movie_Actor {
   id_movie   Int
   id_actor   Int
-  role       String?   @db.VarChar(100)
+  role       String?   @db.VarChar(100) // tipo de rol (ej: "Actor", "Actress")
+  character  String?   @db.VarChar(200) // nombre del personaje
+  order      Int?      // orden en los créditos
   created_at DateTime? @default(now()) @db.Timestamp(6)
 
   Actor Actor @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
@@ -85,7 +111,6 @@ model Movie_Actor {
   @@id([id_movie, id_actor])
   @@index([role])
 }
-
 
 model Review {
   id_review   Int       @id @default(autoincrement())
