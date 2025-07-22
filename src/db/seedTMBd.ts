@@ -1,20 +1,87 @@
-// prisma/seed.js
+// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // Bearer token de TMDB
-const TMDB_BEARER_TOKEN = process.env.TMDB_BEARER_TOKEN;
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const TMDB_BEARER_TOKEN: string | undefined = process.env.TMDB_BEARER_TOKEN;
+const TMDB_BASE_URL: string = 'https://api.themoviedb.org/3';
 
 if (!TMDB_BEARER_TOKEN) {
   console.error('❌ TMDB_BEARER_TOKEN no está configurada en las variables de entorno');
   process.exit(1);
 }
 
+// Interfaces para los tipos de datos
+interface TMDBGenre {
+  id: number;
+  name: string;
+}
+
+interface TMDBGenresResponse {
+  genres: TMDBGenre[];
+}
+
+interface TMDBMovie {
+  id: number;
+  title: string;
+  overview: string;
+  release_date: string;
+  vote_average: number;
+  poster_path: string;
+  backdrop_path: string;
+  original_language: string;
+  vote_count: number;
+  popularity: number;
+  adult: boolean;
+}
+
+interface TMDBMoviesResponse {
+  results: TMDBMovie[];
+}
+
+interface TMDBMovieDetails extends TMDBMovie {
+  runtime: number;
+  genres: TMDBGenre[];
+}
+
+interface TMDBPerson {
+  id: number;
+  name: string;
+  job?: string;
+  character?: string;
+  order?: number;
+}
+
+interface TMDBPersonDetails {
+  id: number;
+  name: string;
+  profile_path: string;
+  biography: string;
+  birthday: string;
+  place_of_birth: string;
+  gender: number;
+}
+
+interface TMDBCreditsResponse {
+  crew: TMDBPerson[];
+  cast: TMDBPerson[];
+}
+
+interface ParsedName {
+  first_name: string;
+  last_name: string;
+}
+
+interface ActorWithRole {
+  actor: any; // Tipo del modelo Prisma Actor
+  character: string;
+  order: number;
+}
+
 // Función para hacer peticiones a TMDB con Bearer token
-async function fetchTMDB(endpoint) {
-  const options = {
+async function fetchTMDB(endpoint: string): Promise<any> {
+  const options: RequestInit = {
     method: 'GET',
     headers: {
       accept: 'application/json',
@@ -30,10 +97,10 @@ async function fetchTMDB(endpoint) {
 }
 
 // Función para parsear nombres completos
-function parseFullName(fullName) {
+function parseFullName(fullName: string): ParsedName {
   if (!fullName) return { first_name: '', last_name: '' };
   
-  const parts = fullName.trim().split(' ');
+  const parts: string[] = fullName.trim().split(' ');
   if (parts.length === 1) {
     return { first_name: parts[0], last_name: '' };
   }
@@ -45,14 +112,14 @@ function parseFullName(fullName) {
 }
 
 // Función para extraer nacionalidad del lugar de nacimiento
-function extractNationality(birthPlace) {
+function extractNationality(birthPlace: string | null): string | null {
   if (!birthPlace) return null;
   
-  const parts = birthPlace.split(',');
-  const country = parts[parts.length - 1].trim();
+  const parts: string[] = birthPlace.split(',');
+  const country: string = parts[parts.length - 1].trim();
   
   // Mapeo de países comunes
-  const countryMap = {
+  const countryMap: Record<string, string> = {
     'USA': 'Estadounidense',
     'United States': 'Estadounidense',
     'UK': 'Británico',
@@ -74,25 +141,27 @@ function extractNationality(birthPlace) {
 }
 
 // Función para limpiar datos existentes (opcional)
-async function cleanDatabase() {
+async function cleanDatabase(): Promise<void> {
   console.log('🧹 Limpiando base de datos...');
   
   // Eliminar en orden para respetar las relaciones
+  await prisma.favorite.deleteMany();
   await prisma.movie_Actor.deleteMany();
-  await prisma.movie.deleteMany();
   await prisma.actor.deleteMany();
+  await prisma.movie.deleteMany();
   await prisma.director.deleteMany();
   await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
   
   console.log('✅ Base de datos limpiada');
 }
 
 // Función para obtener y crear géneros
-async function seedGenres() {
+async function seedGenres(): Promise<any[]> {
   console.log('🎬 Seeding genres...');
   
-  const genresData = await fetchTMDB('/genre/movie/list');
-  const genres = [];
+  const genresData: TMDBGenresResponse = await fetchTMDB('/genre/movie/list');
+  const genres: any[] = [];
   
   for (const genre of genresData.genres) {
     // Primero verificar por tmdb_id
@@ -118,7 +187,7 @@ async function seedGenres() {
         });
         genres.push(createdGenre);
         console.log(`✅ Género creado: ${genre.name}`);
-      } catch (error) {
+      } catch (error: any) {
         if (error.code === 'P2002') {
           // Si aún hay conflicto, buscar el género existente y usarlo
           console.log(`⚠️ Género ya existe: ${genre.name}, usando el existente`);
@@ -155,7 +224,7 @@ async function seedGenres() {
 }
 
 // Función para crear o encontrar un director
-async function createOrFindDirector(person) {
+async function createOrFindDirector(person: TMDBPerson): Promise<any> {
   const existingDirector = await prisma.director.findUnique({
     where: { tmdb_id: person.id }
   });
@@ -165,8 +234,8 @@ async function createOrFindDirector(person) {
   }
   
   // Obtener detalles completos de la persona
-  const personDetails = await fetchTMDB(`/person/${person.id}`);
-  const { first_name, last_name } = parseFullName(person.name);
+  const personDetails: TMDBPersonDetails = await fetchTMDB(`/person/${person.id}`);
+  const { first_name, last_name }: ParsedName = parseFullName(person.name);
   
   const director = await prisma.director.create({
     data: {
@@ -185,7 +254,7 @@ async function createOrFindDirector(person) {
 }
 
 // Función para crear o encontrar un actor
-async function createOrFindActor(person) {
+async function createOrFindActor(person: TMDBPerson): Promise<any> {
   const existingActor = await prisma.actor.findUnique({
     where: { tmdb_id: person.id }
   });
@@ -195,8 +264,8 @@ async function createOrFindActor(person) {
   }
   
   // Obtener detalles completos de la persona
-  const personDetails = await fetchTMDB(`/person/${person.id}`);
-  const { first_name, last_name } = parseFullName(person.name);
+  const personDetails: TMDBPersonDetails = await fetchTMDB(`/person/${person.id}`);
+  const { first_name, last_name }: ParsedName = parseFullName(person.name);
   
   const actor = await prisma.actor.create({
     data: {
@@ -215,9 +284,9 @@ async function createOrFindActor(person) {
 }
 
 // Función para obtener el director de una película
-async function getMovieDirector(movieId) {
-  const credits = await fetchTMDB(`/movie/${movieId}/credits`);
-  const director = credits.crew.find(person => person.job === 'Director');
+async function getMovieDirector(movieId: number): Promise<any> {
+  const credits: TMDBCreditsResponse = await fetchTMDB(`/movie/${movieId}/credits`);
+  const director: TMDBPerson | undefined = credits.crew.find(person => person.job === 'Director');
   
   if (!director) {
     // Director por defecto si no se encuentra
@@ -231,17 +300,17 @@ async function getMovieDirector(movieId) {
 }
 
 // Función para obtener los actores principales de una película
-async function getMovieActors(movieId) {
-  const credits = await fetchTMDB(`/movie/${movieId}/credits`);
-  const mainActors = credits.cast.slice(0, 5); // Solo los primeros 5 actores
+async function getMovieActors(movieId: number): Promise<ActorWithRole[]> {
+  const credits: TMDBCreditsResponse = await fetchTMDB(`/movie/${movieId}/credits`);
+  const mainActors: TMDBPerson[] = credits.cast.slice(0, 5); // Solo los primeros 5 actores
   
-  const actors = [];
+  const actors: ActorWithRole[] = [];
   for (const castMember of mainActors) {
     const actor = await createOrFindActor(castMember);
     actors.push({
       actor,
-      character: castMember.character,
-      order: castMember.order
+      character: castMember.character || '',
+      order: castMember.order || 0
     });
   }
   
@@ -249,19 +318,19 @@ async function getMovieActors(movieId) {
 }
 
 // Función para obtener detalles completos de una película
-async function getMovieDetails(movieId) {
+async function getMovieDetails(movieId: number): Promise<TMDBMovieDetails> {
   return await fetchTMDB(`/movie/${movieId}`);
 }
 
 // Función principal para crear películas
-async function seedMovies(genres) {
+async function seedMovies(genres: any[]): Promise<any[]> {
   console.log('🎭 Seeding movies...');
   
-  const moviesCreated = [];
+  const moviesCreated: any[] = [];
   
   // Obtener películas populares de diferentes páginas para tener variedad
   for (let page = 1; page <= 4; page++) {
-    const moviesData = await fetchTMDB(`/movie/popular?page=${page}`);
+    const moviesData: TMDBMoviesResponse = await fetchTMDB(`/movie/popular?page=${page}`);
     
     for (const movie of moviesData.results.slice(0, 18)) { // ~18 películas por página
       if (moviesCreated.length >= 70) break;
@@ -277,10 +346,10 @@ async function seedMovies(genres) {
         console.log(`📽️ Procesando: ${movie.title}`);
         
         // Obtener detalles completos de la película
-        const movieDetails = await getMovieDetails(movie.id);
+        const movieDetails: TMDBMovieDetails = await getMovieDetails(movie.id);
         
         // Encontrar la categoría principal (primer género)
-        const primaryGenre = movieDetails.genres[0];
+        const primaryGenre: TMDBGenre | undefined = movieDetails.genres[0];
         const category = genres.find(g => g.tmdb_id === primaryGenre?.id) || genres[0];
         
         // Obtener director
@@ -307,7 +376,7 @@ async function seedMovies(genres) {
         });
         
         // Obtener y crear actores
-        const actors = await getMovieActors(movie.id);
+        const actors: ActorWithRole[] = await getMovieActors(movie.id);
         
         for (const actorData of actors) {
           await prisma.movie_Actor.create({
@@ -326,7 +395,7 @@ async function seedMovies(genres) {
         // Pequeña pausa para no sobrecargar la API
         await new Promise(resolve => setTimeout(resolve, 250));
         
-      } catch (error) {
+      } catch (error: any) {
         console.error(`❌ Error procesando película ${movie.title}:`, error.message);
       }
     }
@@ -339,12 +408,12 @@ async function seedMovies(genres) {
 }
 
 // Función principal
-async function main() {
+async function main(): Promise<void> {
   try {
     console.log('🚀 Iniciando seed de la base de datos...');
     
     // Uncomment this line if you want to clean the database before seeding
-    // await cleanDatabase();
+    await cleanDatabase();
     
     // Seed de géneros
     const genres = await seedGenres();
@@ -364,7 +433,7 @@ async function main() {
 
 // Ejecutar el seed
 main()
-  .catch((e) => {
+  .catch((e: Error) => {
     console.error(e);
     process.exit(1);
   });
