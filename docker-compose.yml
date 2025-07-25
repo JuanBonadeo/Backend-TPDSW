@@ -1,15 +1,15 @@
 version: '3'
 
 services:
-  myDB:
-    image: postgres:15.3
-    container_name: cine-citric-db
-    restart: always
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB= cine_citric-db
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
+    myDB:
+        image: postgres:15.3
+        container_name: cine-citric-db
+        restart: always
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=123456
+            - POSTGRES_DB= cine_citric-db
+        volumes:
+            - ./postgres:/var/lib/postgresql/data

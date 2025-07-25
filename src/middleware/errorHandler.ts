@@ -1,28 +1,13 @@
-// src/middleware/errorHandler.ts
-
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../utils/asyncHandler';
 import { errorResponse } from '../utils/responseHandler';
 
-export const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  let error = { ...err };
-  error.message = err.message;
+export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
+    let error = { ...err };
+    error.message = err.message;
 
-  // Log del error para debugging
-  console.error('Error:', err);
+    // Log del error para debugging
+    console.error('Error:', err);
 
-  
-    
-  // Respuesta de error
-  errorResponse(
-    res,
-    error.message || 'Server Error',
-    error.errors || null,
-    error.statusCode || 500
-  );
+    // Respuesta de error
+    errorResponse(res, error.message || 'Server Error', error.errors || null, error.statusCode || 500);
 };

@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 // movie-actor.interface.ts
 export interface CreateMovieActorDto {
@@ -24,18 +24,19 @@ export interface MovieActorResponse {
     };
 }
 export enum Role {
-    PROTAGONIST = "Protagonist",
-    SECCONDARY = "Secondary",
-    EXTRA = "Extra",
+    PROTAGONIST = 'Protagonist',
+    SECCONDARY = 'Secondary',
+    EXTRA = 'Extra',
 }
 
 export const movieActorZodSchema = z.object({
-    id_movie: z.number().int().positive("ID de película inválido"),
-    id_actor: z.number().int().positive("ID de actor inválido"),
+    id_movie: z.number().int().positive('ID de película inválido'),
+    id_actor: z.number().int().positive('ID de actor inválido'),
     role: z.nativeEnum(Role, {
         errorMap: (issue, ctx) => {
-            return { message: `Rol inválido. Valores permitidos: ${Object.values(Role).join(", ")}` };
+            return {
+                message: `Rol inválido. Valores permitidos: ${Object.values(Role).join(', ')}`,
+            };
         },
     }),
 });
-

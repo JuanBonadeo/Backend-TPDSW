@@ -3,29 +3,28 @@ import { Movie_Actor, Actor } from '@prisma/client';
 import { CreateMovieActorDto, Role } from './movie-actor.interface.js';
 
 export class MovieActorDAO {
-
     async add(movieActor: CreateMovieActorDto): Promise<Movie_Actor | null> {
         const result = await prisma.movie_Actor.create({
             data: {
                 id_movie: movieActor.id_movie,
                 id_actor: movieActor.id_actor,
-                role: movieActor.role
+                role: movieActor.role,
             },
             include: {
                 Movie: {
                     select: {
                         id_movie: true,
-                        title: true
-                    }
+                        title: true,
+                    },
                 },
                 Actor: {
                     select: {
                         id_actor: true,
                         first_name: true,
-                        last_name: true
-                    }
-                }
-            }
+                        last_name: true,
+                    },
+                },
+            },
         });
         return result;
     }
@@ -38,9 +37,9 @@ export class MovieActorDAO {
                     select: {
                         id_actor: true,
                         first_name: true,
-                        last_name: true
-                    }
-                }
+                        last_name: true,
+                    },
+                },
             },
         });
         return result;
@@ -53,9 +52,9 @@ export class MovieActorDAO {
                 Movie: {
                     select: {
                         id_movie: true,
-                        title: true
-                    }
-                }
+                        title: true,
+                    },
+                },
             },
         });
         return result;
@@ -66,11 +65,11 @@ export class MovieActorDAO {
             where: {
                 id_movie_id_actor: {
                     id_movie: movieId,
-                    id_actor: actorId
-                }
-            }
+                    id_actor: actorId,
+                },
+            },
         });
-        return result
+        return result;
     }
 
     async updateRole(movieId: number, actorId: number, newRole: Role) {
@@ -78,29 +77,28 @@ export class MovieActorDAO {
             where: {
                 id_movie_id_actor: {
                     id_movie: movieId,
-                    id_actor: actorId
-                }
+                    id_actor: actorId,
+                },
             },
             data: {
-                role: newRole
+                role: newRole,
             },
             include: {
                 Movie: {
                     select: {
                         id_movie: true,
-                        title: true
-                    }
+                        title: true,
+                    },
                 },
                 Actor: {
                     select: {
                         id_actor: true,
                         first_name: true,
-                        last_name: true
-                    }
-                }
-            }
+                        last_name: true,
+                    },
+                },
+            },
         });
         return result;
     }
-
 }
