@@ -23,7 +23,7 @@ export class CategoryController {
     async getOne(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
-            const result = await this.dao.getById(id);
+            const result = await this.dao.getOne(id);
             if (!result) {
                 throw new NotFoundError();
             }
@@ -36,7 +36,7 @@ export class CategoryController {
     async create(req: Request, res: Response) {
         try {
             const newCategory = categoryZodSchema.parse(req.body);
-            const result = await this.dao.add(newCategory);
+            const result = await this.dao.create(newCategory);
             return ResponseHandler.created(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);

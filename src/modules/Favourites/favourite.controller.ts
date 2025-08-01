@@ -11,7 +11,6 @@ export class FavouriteController {
         this.dao = new FavouriteDAO();
     }
 
-
     async getFavouritesByUserId(req: Request, res: Response) {
         try {
             const idUser = idUserParamsSchema.parse(req.params.id);

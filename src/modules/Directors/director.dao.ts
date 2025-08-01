@@ -8,14 +8,14 @@ export class DirectorDAO {
         return categories;
     }
 
-    async getById(id: number): Promise<Director | null> {
+    async getOne(id: number): Promise<Director | null> {
         const director = await prisma.director.findUnique({
             where: { id_director: id },
         });
         return director;
     }
 
-    async add(director: CreateDirectorDto): Promise<Director | null> {
+    async create(director: CreateDirectorDto): Promise<Director | null> {
         const newDirector = await prisma.director.create({
             data: director,
         });

@@ -6,22 +6,12 @@ export const router = Router();
 
 const controller = new DirectorController();
 
-router.get('/', (req: Request, res: Response) => {
-    controller.getAllDirectors(req, res);
-});
+router.get('/', (req: Request, res: Response) => controller.getAll(req, res));
 
-router.get('/:id', (req: Request, res: Response) => {
-    controller.getDirectorById(req, res);
-});
+router.get('/:id', (req: Request, res: Response) => controller.getOne(req, res));
 
-router.post('/', (req: Request, res: Response) => {
-    controller.addDirector(req, res);
-});
+router.post('/', (req: Request, res: Response) => controller.create(req, res));
 
-router.patch('/:id', (req: Request, res: Response) => {
-    controller.updateDirector(req, res);
-});
+router.patch('/:id', (req: Request, res: Response) => controller.update(req, res));
 
-router.delete('/:id', (req: Request, res: Response) => {
-    controller.deleteDirector(req, res);
-});
+router.delete('/:id', (req: Request, res: Response) => controller.delete(req, res));

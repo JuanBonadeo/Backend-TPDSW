@@ -11,7 +11,7 @@ export class ActorController {
         this.dao = new ActorDAO();
     }
 
-    async getAllActors(req: Request, res: Response) {
+    async getAll(req: Request, res: Response) {
         try {
             const result = await this.dao.getAll();
             return ResponseHandler.success(res, result);
@@ -20,10 +20,10 @@ export class ActorController {
         }
     }
 
-    async getActorById(req: Request, res: Response) {
+    async getOne(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
-            const result = await this.dao.getById(id);
+            const result = await this.dao.getOne(id);
 
             if (!result) {
                 throw new NotFoundError();
@@ -34,17 +34,17 @@ export class ActorController {
         }
     }
 
-    async addActor(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         try {
             const newActor = actorZodSchema.parse(req.body);
-            const result = await this.dao.add(newActor);
+            const result = await this.dao.create(newActor);
             return ResponseHandler.created(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
     }
 
-    async updateActor(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
             const updatedData = updateActorZodSchema.parse(req.body);
@@ -55,7 +55,7 @@ export class ActorController {
         }
     }
 
-    async deleteActor(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
             await this.dao.delete(id);

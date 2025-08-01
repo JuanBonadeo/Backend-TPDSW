@@ -12,15 +12,6 @@ export class FavouriteDAO {
         });
     }
 
-    async create(favourite: FavouriteDto): Promise<Favorite> {
-        return prisma.favorite.create({
-            data: {
-                id_user: favourite.id_user,
-                id_movie: favourite.id_movie,
-            },
-        });
-    }
-
     async getAllByUserId(id_user: string): Promise<Favorite[]> {
         return prisma.favorite.findMany({
             where: { id_user },
@@ -34,6 +25,15 @@ export class FavouriteDAO {
             },
             orderBy: {
                 created_at: 'desc',
+            },
+        });
+    }
+
+    async create(favourite: FavouriteDto): Promise<Favorite> {
+        return prisma.favorite.create({
+            data: {
+                id_user: favourite.id_user,
+                id_movie: favourite.id_movie,
             },
         });
     }

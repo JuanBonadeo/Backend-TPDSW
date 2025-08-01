@@ -8,14 +8,14 @@ export class CategoryDAO {
         return categories;
     }
 
-    async getById(id: number): Promise<Category | null> {
+    async getOne(id: number): Promise<Category | null> {
         const category = await prisma.category.findUnique({
             where: { id_category: id },
         });
         return category;
     }
 
-    async add(category: CreateCategoryDto): Promise<Category | null> {
+    async create(category: CreateCategoryDto): Promise<Category | null> {
         const newCategory = await prisma.category.create({
             data: {
                 name: category.name,

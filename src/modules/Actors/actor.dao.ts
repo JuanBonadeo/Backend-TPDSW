@@ -8,14 +8,14 @@ export class ActorDAO {
         return categories;
     }
 
-    async getById(id: number): Promise<Actor | null> {
+    async getOne(id: number): Promise<Actor | null> {
         const actor = await prisma.actor.findUnique({
             where: { id_actor: id },
         });
         return actor;
     }
 
-    async add(actor: CreateActorDto): Promise<Actor | null> {
+    async create(actor: CreateActorDto): Promise<Actor | null> {
         const newActor = await prisma.actor.create({
             data: {
                 first_name: actor.first_name,

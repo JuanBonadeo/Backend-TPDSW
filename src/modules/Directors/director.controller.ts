@@ -24,7 +24,7 @@ export class DirectorController {
     async getOne(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
-            const result = await this.dao.getById(id);
+            const result = await this.dao.getOne(id);
             if (!result) {
                 throw new NotFoundError();
             }
@@ -37,7 +37,7 @@ export class DirectorController {
     async create(req: Request, res: Response) {
         try {
             const newDirector = directorZodSchema.parse(req.body);
-            const result = await this.dao.add(newDirector);
+            const result = await this.dao.create(newDirector);
             return ResponseHandler.created(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
@@ -55,11 +55,11 @@ export class DirectorController {
         }
     }
 
-    async deleteCategory(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
-            await this.dao.delete(id);
-            return ResponseHandler.deleted(res);
+            const result = await this.dao.delete(id);
+            return ResponseHandler.success(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
