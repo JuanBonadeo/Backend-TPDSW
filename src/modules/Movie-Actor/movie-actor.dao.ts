@@ -1,15 +1,11 @@
 import prisma from '../../db/db.js';
-import { Movie_Actor, Actor } from '@prisma/client';
-import { CreateMovieActorDto, Role } from './movie-actor.interface.js';
+import { Movie_Actor } from '@prisma/client';
+import { CreateMovieActorDto, UpdateMovieActorDto } from './movie-actor.dtos.js';
 
 export class MovieActorDAO {
-    async add(movieActor: CreateMovieActorDto): Promise<Movie_Actor | null> {
+    async create(movieActor: CreateMovieActorDto): Promise<Movie_Actor | null> {
         const result = await prisma.movie_Actor.create({
-            data: {
-                id_movie: movieActor.id_movie,
-                id_actor: movieActor.id_actor,
-                role: movieActor.role,
-            },
+            data: { ...movieActor },
             include: {
                 Movie: {
                     select: {
@@ -72,7 +68,7 @@ export class MovieActorDAO {
         return result;
     }
 
-    async updateRole(movieId: number, actorId: number, newRole: Role) {
+    async update(movieId: number, actorId: number, newMovieActor: UpdateMovieActorDto): Promise<Movie_Actor | null> {
         const result = await prisma.movie_Actor.update({
             where: {
                 id_movie_id_actor: {
@@ -81,7 +77,7 @@ export class MovieActorDAO {
                 },
             },
             data: {
-                role: newRole,
+                ...newMovieActor,
             },
             include: {
                 Movie: {
