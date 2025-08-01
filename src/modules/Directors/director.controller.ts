@@ -1,12 +1,9 @@
-// Agregar validacion de parametros
-import { Director } from '@prisma/client';
-import { DirectorDAO } from './director.dao.js';
 import { Request, Response } from 'express';
-import { CreateDirectorDto, directorZodSchema } from './director.interface.js';
-import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
+import { DirectorDAO } from './director.dao.js';
+import { CreateDirectorDto, directorZodSchema, idParamsSchema, updateDirectorZodSchema } from './director.dtos.js';
+import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
 
-import { z } from 'zod';
-import { error } from 'console';
 
 export class DirectorController {
     private dao: DirectorDAO;
@@ -15,103 +12,57 @@ export class DirectorController {
         this.dao = new DirectorDAO();
     }
 
-    async getAllDirectors(req: Request, res: Response) {
+    async getAll(req: Request, res: Response) {
         try {
             const result = await this.dao.getAll();
-            if (!result || result.length === 0) {
-                return notFoundResponse(res, 'Directores no encontrados');
-            }
-            successResponse(res, result, 'Directores obtenidos con éxito', 200);
+            return ResponseHandler.success(res, result);
         } catch (error) {
-            internalServerErrorResponse(res, 'Error al obtener los directores', error as any);
+            return ErrorHandler.handle(error, res);
         }
     }
 
-    async getDirectorById(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-        const idSchema = z.coerce.number().int().positive();
-        const validation = idSchema.safeParse(id);
-        if (!validation.success) {
-            return zodErrorResponse(res, 'ID de director inválido', validation.error.errors);
-        }
-
+    async getOne(req: Request, res: Response) {
         try {
+            const id = idParamsSchema.parse(req.params.id);
             const result = await this.dao.getById(id);
-
             if (!result) {
-                return notFoundResponse(res, 'Director no encontrado');
+                throw new NotFoundError();
             }
-            successResponse(res, result, 'Director obtenido con éxito', 200);
+            return ResponseHandler.success(res, result);
         } catch (error) {
-            internalServerErrorResponse(res, 'Error al obtener el director', error as any);
+            return ErrorHandler.handle(error, res);
         }
     }
 
-    async addDirector(req: Request, res: Response) {
-        const newDirector = req.body as CreateDirectorDto;
-        const validation = directorZodSchema.safeParse(newDirector);
-        if (!validation.success) {
-            return zodErrorResponse(res, 'Datos de director inválidos', validation.error.errors);
-        }
+    async create(req: Request, res: Response) {
         try {
+            const newDirector = directorZodSchema.parse(req.body);
             const result = await this.dao.add(newDirector);
-            if (!result) {
-                return errorResponse(res, 'Error al agregar el director', null, 400);
-            }
-            successResponse(res, result, 'Director agregado correctamente', 201);
+            return ResponseHandler.created(res, result);
         } catch (error) {
-            internalServerErrorResponse(res, 'Error al agregar el director', error as any);
+            return ErrorHandler.handle(error, res);
         }
     }
 
-    async updateDirector(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-        const updatedData = req.body as Director;
-        const data = { ...updatedData, id };
-        const validation = directorZodSchema.safeParse(data);
-        if (!validation.success) {
-            return zodErrorResponse(res, 'Datos de director inválidos', validation.error.errors);
-        }
-
+    async update(req: Request, res: Response) {
         try {
-            if (!updatedData || Object.keys(updatedData).length === 0) {
-                return notFoundResponse(res, 'No se proporcionaron datos para actualizar el director');
-            }
-
-            const existingDirector = await this.dao.getById(id);
-            if (!existingDirector) {
-                return notFoundResponse(res, 'Director no encontrado');
-            }
+            const id = idParamsSchema.parse(req.params.id);
+            const updatedData = updateDirectorZodSchema.parse(req.body);
             const result = await this.dao.update(id, updatedData);
-            if (!result) {
-                return errorResponse(res, 'Error al actualizar el director', null, 400);
-            }
-            successResponse(res, result, 'Director actualizado correctamente', 200);
+            return ResponseHandler.success(res, result);
         } catch (error) {
-            internalServerErrorResponse(res, 'Error al actualizar el director', error as any);
+            return ErrorHandler.handle(error, res);
         }
     }
 
-    async deleteDirector(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-        const idSchema = z.coerce.number().int().positive();
-        const validation = idSchema.safeParse(id);
-        if (!validation.success) {
-            return zodErrorResponse(res, 'ID de director inválido', validation.error.errors);
-        }
-
+    async deleteCategory(req: Request, res: Response) {
         try {
-            const existingDirector = await this.dao.getById(id);
-            if (!existingDirector) {
-                return notFoundResponse(res, 'Director no encontrado');
-            }
-            const result = await this.dao.delete(id);
-            if (!result) {
-                return errorResponse(res, 'Error al eliminar el director', null, 400);
-            }
-            successResponse(res, { id }, 'Director eliminado correctamente', 200);
+            const id = idParamsSchema.parse(req.params.id);
+            await this.dao.delete(id);
+            return ResponseHandler.deleted(res);
         } catch (error) {
-            internalServerErrorResponse(res, 'Error al eliminar el director', error as any);
+            return ErrorHandler.handle(error, res);
         }
     }
 }
+

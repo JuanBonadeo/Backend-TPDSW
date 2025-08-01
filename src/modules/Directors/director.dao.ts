@@ -1,6 +1,6 @@
 import prisma from '../../db/db.js';
 import { Director } from '@prisma/client';
-import { CreateDirectorDto } from './director.interface.js';
+import { CreateDirectorDto, UpdateDirectorDto } from './director.dtos.js';
 
 export class DirectorDAO {
     async getAll(): Promise<Director[] | null> {
@@ -17,22 +17,15 @@ export class DirectorDAO {
 
     async add(director: CreateDirectorDto): Promise<Director | null> {
         const newDirector = await prisma.director.create({
-            data: {
-                first_name: director.first_name,
-                last_name: director.last_name,
-            },
+            data: director,
         });
         return newDirector;
     }
 
-    async update(id: number, updatedDirector: Director): Promise<Director | null> {
+    async update(id: number, updatedDirector: UpdateDirectorDto): Promise<Director | null> {
         const result = await prisma.director.update({
             where: { id_director: id },
-            data: {
-                first_name: updatedDirector.first_name,
-                last_name: updatedDirector.last_name,
-                nationality: updatedDirector.nationality,
-            },
+            data: updatedDirector,
         });
         return result;
     }
