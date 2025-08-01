@@ -1,0 +1,1 @@
+{"error":{"clientVersion":"6.10.0","code":"P2021","meta":{"modelName":"Movie","table":"public.Movie"},"name":"PrismaClientKnownRequestError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-01T14:58:13.004Z"}

@@ -144,15 +144,6 @@ function extractNationality(birthPlace: string | null): string | null {
 async function cleanDatabase(): Promise<void> {
     console.log('🧹 Limpiando base de datos...');
 
-    // Eliminar en orden para respetar las relaciones
-    await prisma.favorite.deleteMany();
-    await prisma.movie_Actor.deleteMany();
-    await prisma.actor.deleteMany();
-    await prisma.movie.deleteMany();
-    await prisma.director.deleteMany();
-    await prisma.category.deleteMany();
-    await prisma.user.deleteMany();
-
     console.log('✅ Base de datos limpiada');
 }
 
