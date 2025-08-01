@@ -28,6 +28,15 @@ export class ResponseHandler {
     ): Response {
         return this.success(res, data, message, 200);
     }
+    static deleted(
+        res: Response,
+        message: string = 'Recurso eliminado'
+    ): Response {
+        return res.status(204).json({
+            success: true,
+            message
+        });
+    }
 
     // Para respuestas paginadas
     static paginated<T>(

@@ -14,9 +14,9 @@ export class ActorController {
     async getAllActors(req: Request, res: Response) {
         try {
             const result = await this.dao.getAll();
-            return ResponseHandler.success(res, result, 'Actores obtenidos con éxito');
+            return ResponseHandler.success(res, result);
         } catch (error) {
-            return ErrorHandler.handle(error, res)
+            return ErrorHandler.handle(error, res);
         }
     }
 
@@ -26,7 +26,7 @@ export class ActorController {
             const result = await this.dao.getById(id);
 
             if (!result) {
-                throw new NotFoundError('Actor no encontrado');
+                throw new NotFoundError();
             }
             return ResponseHandler.success(res, result);
         } catch (error) {
@@ -44,7 +44,6 @@ export class ActorController {
         }
     }
 
-
     async updateActor(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
@@ -60,7 +59,7 @@ export class ActorController {
         try {
             const id = idParamsSchema.parse(req.params.id);
             await this.dao.delete(id);
-            return ResponseHandler.success(res, null, 'Actor eliminado con éxito', 204);
+            return ResponseHandler.deleted(res);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
