@@ -10,12 +10,11 @@ export const router = Router();
 router.post('/sign-up', async (req: Request, res: Response) => {
     try {
         const body = req.body;
-        const response = await auth.api.createUser({
+        const response = await auth.api.signUpEmail({
             body: {
                 email: body.email, // required
                 password: body.password, // required
                 name: body.name, // required
-                role: body.role, // required
             },
         });
         if (!response) {

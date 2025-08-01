@@ -353,7 +353,7 @@ async function seedMovies(genres: any[]): Promise<any[]> {
                         title: movie.title,
                         description: movie.overview,
                         duration: movieDetails.runtime,
-                        release_date: movie.release_date ? new Date(movie.release_date).getFullYear() : null,
+                        release_date: movie.release_date ? new Date(movie.release_date).getFullYear() : 0,
                         rating: movie.vote_average,
                         tmdb_id: movie.id,
                         poster_path: movie.poster_path,

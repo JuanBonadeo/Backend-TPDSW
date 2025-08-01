@@ -1,10 +1,9 @@
 // Agregar validacion de parametros
 import { Request, Response } from 'express';
 import { MovieDAO } from './movie.dao.js';
-import { CreateMovieDto, idParamsSchema, MovieFilters, movieZodSchema, movieZodSchemaQuery } from './movie.dtos.js';
+import { idParamsSchema, movieZodSchema, movieZodSchemaQuery } from './movie.dtos.js';
 import { ResponseHandler } from '../../utils/ResponseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
-import { Movie } from '@prisma/client';
 
 
 export class MovieController {

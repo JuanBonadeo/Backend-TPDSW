@@ -9,6 +9,8 @@ import { router as routerDirectors } from './modules/Directors/director.routes.j
 import { router as routerMovieActors } from './modules/Movie-Actor/movie-actor.routes.js';
 import { router as routerAuth } from './modules/Auth/auth.routes.js';
 import { router as routerFavourites } from './modules/Favourites/favourite.routes.js';
+import { router as routerReviews } from './modules/Review/review.routes.js';
+
 
 const app = express();
 app.use(
@@ -37,5 +39,6 @@ app.use('/actors', routerActors);
 app.use('/directors', routerDirectors);
 app.use('/movie-actors', routerMovieActors);
 app.use('/favourites', routerFavourites);
+app.use('/reviews', routerReviews);
 
 app.use('/auth', routerAuth);

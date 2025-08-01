@@ -15,7 +15,7 @@
 
 6. [x] CRUD de favoritos
 
-7. [] CRUD de reseñas @Slashy
+7. [x] CRUD de reseñas @Slashy Osea Yo
 
 8. [x] Usar la API de IMDB para cargar toda la data en el seed
 
@@ -28,7 +28,6 @@
 
 - [ ] **Agregar role (user, admin)**
 - [ ] **Verificar middleware** protege todas las rutas necesarias
-- [ ] **Probar logout** funciona correctamente
 
 # 🎯 Para Aprobación Directa (OBLIGATORIO)
 

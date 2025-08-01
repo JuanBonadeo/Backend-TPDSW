@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { CategoryDAO } from './category.dao.js';
-import { categoryZodSchema, CreateCategoryDto, idParamsSchema, updateCategoryZodSchema } from './category.dtos.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { categoryZodSchema, idParamsSchema, updateCategoryZodSchema } from './category.dtos.js';
+import * as ResponseHandler from '../../utils/ResponseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
 
 export class CategoryController {
@@ -14,7 +14,7 @@ export class CategoryController {
     async getAll(req: Request, res: Response) {
         try {
             const result = await this.dao.getAll();
-            return ResponseHandler.success(res, result);
+            return ResponseHandler.ResponseHandler.success(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
@@ -27,7 +27,7 @@ export class CategoryController {
             if (!result) {
                 throw new NotFoundError();
             }
-            return ResponseHandler.success(res, result);
+            return ResponseHandler.ResponseHandler.success(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
@@ -37,7 +37,7 @@ export class CategoryController {
         try {
             const newCategory = categoryZodSchema.parse(req.body);
             const result = await this.dao.create(newCategory);
-            return ResponseHandler.created(res, result);
+            return ResponseHandler.ResponseHandler.created(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
@@ -48,7 +48,7 @@ export class CategoryController {
             const id = idParamsSchema.parse(req.params.id);
             const updatedData = updateCategoryZodSchema.parse(req.body);
             const result = await this.dao.update(id, updatedData);
-            return ResponseHandler.success(res, result);
+            return ResponseHandler.ResponseHandler.success(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
@@ -58,7 +58,7 @@ export class CategoryController {
         try {
             const id = idParamsSchema.parse(req.params.id);
             await this.dao.delete(id);
-            return ResponseHandler.deleted(res);
+            return ResponseHandler.ResponseHandler.deleted(res);
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
