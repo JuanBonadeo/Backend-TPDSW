@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { Category } from '@prisma/client';
 import { CreateCategoryDto } from './category.interface.js';
 

@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { Movie } from '@prisma/client';
 import { CreateMovieDto, MovieFilters, movieList } from './movie.interface.js';
 

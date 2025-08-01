@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { FavouriteDTO } from './favourite.interface.js';
 
 export class FavouriteDAO {

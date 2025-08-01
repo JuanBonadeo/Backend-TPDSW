@@ -3,8 +3,8 @@ import { MovieActorDAO } from './movie-actor.dao.js';
 import { CreateMovieActorDto, movieActorZodSchema } from './movie-actor.interface.js';
 import { MovieDAO } from '../Movies/movie.dao.js';
 import { ActorDAO } from '../Actors/actor.dao.js';
-import { Role } from './movie-actor.interface';
-import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../utils/responseHandler.js';
+import { Role } from './movie-actor.interface.js';
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
 import z from 'zod';
 
 export class MovieActorController {

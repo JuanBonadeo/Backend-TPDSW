@@ -1,18 +1,19 @@
 import { Router } from 'express';
 import { Request, Response } from 'express';
-import { auth } from './auth.js';
-import { internalServerErrorResponse, successResponse } from '../utils/responseHandler.js';
+import { auth } from '../../utils/auth.js';
+import { internalServerErrorResponse, successResponse } from '../../utils/ResponseHandler.js';
 
 export const router = Router();
 
 router.post('/sign-up', async (req: Request, res: Response) => {
     try {
-        const { email, password, name } = req.body;
-        const response = await auth.api.signUpEmail({
+        const body = req.body;
+        const response = await auth.api.createUser({
             body: {
-                email,
-                password,
-                name,
+                email: body.email, // required
+                password: body.password, // required
+                name: body.name, // required
+                role: body.role, // required
             },
         });
         if (!response) {

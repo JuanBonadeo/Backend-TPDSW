@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,27 +12,26 @@ model Movie {
   id_movie Int @id @default(autoincrement())
 
   // Campos integrados con TMDB
-  title        String  @unique(map: "Movie_title_idx") @db.VarChar(200)
-  description  String? @db.VarChar(1000) 
-  duration     Int?    
-  release_date Int?    
-  rating       Float?  @default(0) // vote_average de TMDB (0-10)
-  
+  title             String  @unique(map: "Movie_title_idx") @db.VarChar(200)
+  description       String? @db.VarChar(1000)
+  duration          Int?
+  release_date      Int?
+  rating            Float?  @default(0) // vote_average de TMDB (0-10)
   // Campos adicionales de TMDB
-  tmdb_id      Int?    @unique // ID de TMDB para sincronización
-  poster_path  String? @db.VarChar(500)
-  backdrop_path String? @db.VarChar(500)
+  tmdb_id           Int?    @unique // ID de TMDB para sincronización
+  poster_path       String? @db.VarChar(500)
+  backdrop_path     String? @db.VarChar(500)
   original_language String? @db.VarChar(10)
-  vote_count   Int?    @default(0)
-  popularity   Float?  @default(0)
-  adult        Boolean @default(false)
+  vote_count        Int?    @default(0)
+  popularity        Float?  @default(0)
+  adult             Boolean @default(false)
 
   id_director Int
   id_category Int
 
   created_at  DateTime?     @default(now()) @db.Timestamp(6)
   updated_at  DateTime?     @default(now()) @db.Timestamp(6)
-  Favorite    Favorite[]    
+  Favorite    Favorite[]
   Movie_Actor Movie_Actor[]
   Review      Review[]
 
@@ -42,56 +42,52 @@ model Movie {
 model Category {
   id_category Int       @id @default(autoincrement())
   name        String    @unique @db.VarChar(50) // nombre del género de TMDB
-  description String?   // descripción generada
+  description String? // descripción generada
   tmdb_id     Int?      @unique // ID de género en TMDB para sincronización
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie[]
 }
 
 model Director {
-  id_director Int       @id @default(autoincrement())
-  first_name  String    @db.VarChar(100)
-  last_name   String    @db.VarChar(100)
-  nationality String?   @db.VarChar(50) // extraído de place_of_birth
-  
+  id_director  Int       @id @default(autoincrement())
+  first_name   String    @db.VarChar(100)
+  last_name    String    @db.VarChar(100)
+  nationality  String?   @db.VarChar(50) // extraído de place_of_birth
   // Campos adicionales integrados de TMDB
-  tmdb_id     Int?      @unique // ID de persona en TMDB
-  profile_path String?  @db.VarChar(500)
-  biography   String?   @db.Text
-  birth_date  DateTime? @db.Date
-  birth_place String?   @db.VarChar(200)
-  
-  created_at  DateTime? @default(now()) @db.Timestamp(6)
-  Movie       Movie[]
+  tmdb_id      Int?      @unique // ID de persona en TMDB
+  profile_path String?   @db.VarChar(500)
+  biography    String?   @db.Text
+  birth_date   DateTime? @db.Date
+  birth_place  String?   @db.VarChar(200)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  Movie        Movie[]
 
   @@unique([first_name, last_name], map: "Director_first_name_last_name_idx")
 }
 
 model Actor {
-  id_actor    Int           @id @default(autoincrement())
-  first_name  String        @db.VarChar(100)
-  last_name   String        @db.VarChar(100)
-  birth_date  DateTime?     @db.Date
-  
+  id_actor     Int           @id @default(autoincrement())
+  first_name   String        @db.VarChar(100)
+  last_name    String        @db.VarChar(100)
+  birth_date   DateTime?     @db.Date
   // Campos adicionales integrados de TMDB
-  tmdb_id     Int?          @unique // ID de persona en TMDB
-  profile_path String?      @db.VarChar(500)
-  biography   String?       @db.Text
-  birth_place String?       @db.VarChar(200)
-  gender      Int?          // 1 = femenino, 2 = masculino, 0 = no especificado
-  
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  Movie_Actor Movie_Actor[]
+  tmdb_id      Int?          @unique // ID de persona en TMDB
+  profile_path String?       @db.VarChar(500)
+  biography    String?       @db.Text
+  birth_place  String?       @db.VarChar(200)
+  gender       Int? // 1 = femenino, 2 = masculino, 0 = no especificado
+  created_at   DateTime?     @default(now()) @db.Timestamp(6)
+  Movie_Actor  Movie_Actor[]
 
   @@index([first_name, last_name])
 }
 
 model Favorite {
-  id_user            String
-  id_movie           Int
-  created_at         DateTime? @default(now()) @db.Timestamp(6)
-  Movie              Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
-  User               User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id_user    String
+  id_movie   Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  User       User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_user, id_movie])
   @@index([id_movie, id_user])
@@ -102,7 +98,7 @@ model Movie_Actor {
   id_actor   Int
   role       String?   @db.VarChar(100) // tipo de rol (ej: "Actor", "Actress")
   character  String?   @db.VarChar(200) // nombre del personaje
-  order      Int?      // orden en los créditos
+  order      Int? // orden en los créditos
   created_at DateTime? @default(now()) @db.Timestamp(6)
 
   Actor Actor @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
@@ -114,7 +110,7 @@ model Movie_Actor {
 
 model Review {
   id_review   Int       @id @default(autoincrement())
-  id_user String
+  id_user     String
   id_movie    Int
   score       Int
   comment     String?
@@ -127,14 +123,15 @@ model Review {
 }
 
 // BETTERAUTH MODELS
+
 model User {
-  id           String     @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String     @db.VarChar(100)
   email         String     @unique(map: "User_email_idx") @db.VarChar(255)
   birth_date    DateTime?  @db.Date
   created_at    DateTime?  @default(now()) @db.Timestamp(6)
   updated_at    DateTime?  @default(now()) @db.Timestamp(6)
-  Favorite      Favorite[] 
+  Favorite      Favorite[]
   Review        Review[]
   emailVerified Boolean
   image         String?
@@ -142,6 +139,11 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+
+  role       String?
+  banned     Boolean?
+  banReason  String?
+  banExpires DateTime?
 
   @@map("user")
 }
@@ -156,6 +158,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
 
   @@unique([token])
   @@map("session")

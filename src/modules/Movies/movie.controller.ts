@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CreateMovieDto, movieZodSchema, movieZodSchemaQuery } from './movie.interface.js';
 import { CategoryDAO } from '../Categories/category.dao.js';
 import { DirectorDAO } from '../Directors/director.dao.js';
-import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../utils/responseHandler.js';
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
 
 export class MovieController {
     private dao: MovieDAO;

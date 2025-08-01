@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { FavouriteDAO } from './favourite.dao.js';
 import { FavouriteDTO, favouriteZodSchema } from './favourite.interface.js';
-import { internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../utils/responseHandler.js';
+import { internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
 import z from 'zod';
 import { MovieDAO } from '../Movies/movie.dao.js';
 

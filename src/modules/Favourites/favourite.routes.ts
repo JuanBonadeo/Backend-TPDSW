@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Request, Response } from 'express';
-import { successResponse } from '../utils/responseHandler';
+import { successResponse } from '../../utils/ResponseHandler';
 import { FavouriteController } from './favourite.controller.js';
 
 export const router = Router();

@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { Director } from '@prisma/client';
 import { CreateDirectorDto } from './director.interface.js';
 

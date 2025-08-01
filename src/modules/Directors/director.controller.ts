@@ -3,7 +3,7 @@ import { Director } from '@prisma/client';
 import { DirectorDAO } from './director.dao.js';
 import { Request, Response } from 'express';
 import { CreateDirectorDto, directorZodSchema } from './director.interface.js';
-import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../utils/responseHandler.js';
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
 
 import { z } from 'zod';
 import { error } from 'console';

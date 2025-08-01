@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { Movie_Actor, Actor } from '@prisma/client';
 import { CreateMovieActorDto, Role } from './movie-actor.interface.js';
 

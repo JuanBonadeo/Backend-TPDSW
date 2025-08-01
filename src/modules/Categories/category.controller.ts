@@ -3,7 +3,7 @@ import { Category } from '@prisma/client';
 import { CategoryDAO } from './category.dao.js';
 import { Request, Response } from 'express';
 import { categoryZodSchema, CreateCategoryDto } from './category.interface.js';
-import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../utils/responseHandler.js';
+import { errorResponse, internalServerErrorResponse, notFoundResponse, successResponse, zodErrorResponse } from '../../utils/ResponseHandler.js';
 import z from 'zod';
 
 export class CategoryController {

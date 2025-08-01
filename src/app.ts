@@ -1,14 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import { auth } from './Auth/auth.js';
+import { auth } from './utils/auth.js';
 import { toNodeHandler } from 'better-auth/node';
-import { router as routerCategories } from './Categories/category.routes.js';
-import { router as routerMovies } from './Movies/movie.routes.js';
-import { router as routerActors } from './Actors/actor.routes.js';
-import { router as routerDirectors } from './Directors/director.routes.js';
-import { router as routerMovieActors } from './Movie-Actor/movie-actor.routes.js';
-import { router as routerAuth } from './Auth/auth.routes.js';
-import { router as routerFavourites } from './Favourites/favourite.routes.js';
+import { router as routerCategories } from './modules/Categories/category.routes.js';
+import { router as routerMovies } from './modules/Movies/movie.routes.js';
+import { router as routerActors } from './modules/Actors/actor.routes.js';
+import { router as routerDirectors } from './modules/Directors/director.routes.js';
+import { router as routerMovieActors } from './modules/Movie-Actor/movie-actor.routes.js';
+import { router as routerAuth } from './modules/Auth/auth.routes.js';
+import { router as routerFavourites } from './modules/Favourites/favourite.routes.js';
 
 const app = express();
 app.use(

@@ -1,6 +1,6 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { Actor } from '@prisma/client';
-import { CreateActorDto } from './actor.interface.js';
+import { CreateActorDto, UpdateActorDto } from './actor.dtos.js';
 
 export class ActorDAO {
     async getAll(): Promise<Actor[] | null> {
@@ -25,7 +25,7 @@ export class ActorDAO {
         return newActor;
     }
 
-    async update(id: number, updatedActor: Actor): Promise<Actor | null> {
+    async update(id: number, updatedActor: UpdateActorDto): Promise<Actor | null> {
         const result = await prisma.actor.update({
             where: { id_actor: id },
             data: {
