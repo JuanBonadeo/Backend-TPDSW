@@ -54,7 +54,7 @@ export class CategoryController {
         }
     }
 
-    async deleteCategory(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
             await this.dao.delete(id);
