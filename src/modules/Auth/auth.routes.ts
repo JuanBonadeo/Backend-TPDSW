@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { Request, Response } from 'express';
 import { auth } from '../../utils/auth.js';
-import { internalServerErrorResponse, successResponse } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ErrorHandler } from '../../utils/ErrorHandler.js';
+
 
 export const router = Router();
 
@@ -17,13 +19,11 @@ router.post('/sign-up', async (req: Request, res: Response) => {
             },
         });
         if (!response) {
-            internalServerErrorResponse(res, 'Sign-up failed');
-            return;
+            throw new Error('User creation failed');
         }
-        successResponse(res, response, 'Sign-up successful');
+        return ResponseHandler.created(res, response, 'User created successfully');  
     } catch (error) {
-        console.error('Error during sign-up:', error);
-        res.status(500).json({ error: 'Sign-up failed' });
+        return ErrorHandler.handle(error, res);
     }
 });
 
@@ -38,9 +38,12 @@ router.post('/sign-in', async (req: Request, res: Response) => {
             returnHeaders: true,
         });
 
-        successResponse(res, response, 'Sign-in successful');
+        if (!response) {
+            throw new Error('User sign-in failed');
+        }
+        
+        return ResponseHandler.success(res, response, 'User signed in successfully');
     } catch (error) {
-        console.error('Error during sign-in:', error);
-        res.status(500).json({ error: 'Sign-in failed' });
+        return ErrorHandler.handle(error, res);
     }
 });

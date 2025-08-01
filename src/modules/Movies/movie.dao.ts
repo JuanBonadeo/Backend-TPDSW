@@ -1,6 +1,6 @@
 import prisma from '../../db/db.js';
 import { Movie } from '@prisma/client';
-import { CreateMovieDto, MovieFilters, movieList } from './movie.interface.js';
+import { CreateMovieDto, MovieFilters, movieList, MovieQueryDto, UpdateMovieDto } from './movie.dtos.js';
 
 export class MovieDAO {
     async getAll(): Promise<Movie[] | null> {
@@ -13,18 +13,18 @@ export class MovieDAO {
         return movies;
     }
 
-    async getById(id: number): Promise<Movie | null> {
+    async getOne(id: number): Promise<Movie | null> {
         const movie = await prisma.movie.findUnique({
             where: { id_movie: id },
             include: {
-                Category: true, // Include the related category information
-                Director: true, // Include the related director information
+                Category: true,
+                Director: true,
             },
         });
         return movie;
     }
 
-    async add(movie: CreateMovieDto): Promise<Movie | null> {
+    async create(movie: CreateMovieDto): Promise<Movie | null> {
         const newMovie = await prisma.movie.create({
             data: {
                 title: movie.title,
@@ -44,7 +44,7 @@ export class MovieDAO {
         return newMovie;
     }
 
-    async update(id: number, updatedMovie: Movie): Promise<Movie | null> {
+    async update(id: number, updatedMovie: UpdateMovieDto): Promise<Movie | null> {
         const result = await prisma.movie.update({
             where: { id_movie: id },
             data: {
@@ -65,25 +65,25 @@ export class MovieDAO {
         return result;
     }
 
-    async listMovies(page: number = 1, take: number = 12, filters: MovieFilters = {}): Promise<movieList | null> {
+    async listMovies(query: MovieQueryDto): Promise<movieList | null> {
         const where: any = {
-            ...(filters.categoryId && { id_category: filters.categoryId }),
-            ...(filters.directorId && { id_director: filters.directorId }),
-            ...(filters.actorId && {
-                actors: { some: { id_actor: filters.actorId } },
+            ...(query.categoryId && { id_category: query.categoryId }),
+            ...(query.directorId && { id_director: query.directorId }),
+            ...(query.actorId && {
+                actors: { some: { id_actor: query.actorId } },
             }),
         };
 
         const movies = await prisma.movie.findMany({
-            skip: (page - 1) * take,
-            take,
+            skip: (query.page - 1) * query.limit,
+            take: query.limit,
             where,
         });
         const totalMovies = await prisma.movie.count({ where });
 
         return {
-            currentPage: page,
-            totalPages: Math.ceil(totalMovies / take),
+            currentPage: query.page,
+            totalPages: Math.ceil(totalMovies / query.limit),
             movies,
         };
     }

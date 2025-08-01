@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { Response } from "express";
 import { ZodError } from "zod";
+import { logger } from "./logger.js";
 
 // Errores personalizados
 export class NotFoundError extends Error {
@@ -62,6 +63,8 @@ export class ErrorHandler {
   };
 
   static handle(error: unknown, res: Response): Response {
+    // Loguea el error
+    logger.error("Error atrapado por ErrorHandler", { error });
     // Errores de Prisma
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       const info = this.prismaErrorMessages[error.code] || {

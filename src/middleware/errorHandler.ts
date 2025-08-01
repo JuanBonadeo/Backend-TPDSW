@@ -1,13 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
-import { errorResponse } from '../utils/ResponseHandler';
+import { NextFunction, Request, Response } from 'express';
+import { ErrorHandler } from '../utils/ErrorHandler';
 
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
-    let error = { ...err };
-    error.message = err.message;
-
-    // Log del error para debugging
-    console.error('Error:', err);
-
-    // Respuesta de error
-    errorResponse(res, error.message || 'Server Error', error.errors || null, error.statusCode || 500);
+export const globalErrorHandler = (
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  ErrorHandler.handle(err, res);
 };
