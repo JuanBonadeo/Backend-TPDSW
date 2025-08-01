@@ -47,7 +47,7 @@ export class ActorController {
     async updateActor(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
-            const updatedData = updateActorZodSchema.partial().parse(req.body);
+            const updatedData = updateActorZodSchema.parse(req.body);
             const result = await this.dao.update(id, updatedData);
             return ResponseHandler.success(res, result);
         } catch (error) {

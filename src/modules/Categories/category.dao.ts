@@ -1,6 +1,6 @@
 import prisma from '../../db/db.js';
 import { Category } from '@prisma/client';
-import { CreateCategoryDto } from './category.interface.js';
+import { CreateCategoryDto, UpdateCategoryDto } from './category.dtos.js';
 
 export class CategoryDAO {
     async getAll(): Promise<Category[] | null> {
@@ -25,7 +25,7 @@ export class CategoryDAO {
         return newCategory;
     }
 
-    async update(id: number, updatedCategory: Category): Promise<Category | null> {
+    async update(id: number, updatedCategory: UpdateCategoryDto): Promise<Category | null> {
         const result = await prisma.category.update({
             where: { id_category: id },
             data: {
