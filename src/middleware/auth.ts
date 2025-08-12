@@ -17,9 +17,9 @@ export class AuthMiddleware {
     static authenticate(req: Request, res: Response, next: NextFunction) {
         try {
             const token = AuthUtils.getTokenFromHeader(req.headers.authorization);
-            
+
             if (!token) {
-                throw new UnauthorizedError('No token provided');
+                throw new UnauthorizedError('Token no encontrado en la cabecera Authorization');
             }
 
             const decoded = AuthUtils.verifyToken(token);
@@ -27,10 +27,10 @@ export class AuthMiddleware {
             next();
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
-                throw new UnauthorizedError('Invalid token');
+                throw new UnauthorizedError('Token inválido');
             }
             if (error instanceof jwt.TokenExpiredError) {
-                throw new UnauthorizedError('Token expired');
+                throw new UnauthorizedError('Token expirado');
             }
             return ErrorHandler.handle(error, res);
         }
@@ -38,27 +38,33 @@ export class AuthMiddleware {
 
     static authorize(roles: string[]) {
         return (req: Request, res: Response, next: NextFunction) => {
-            if (!req.user) {
-                throw new UnauthorizedError('User not authenticated');
+            try {
+                if (!req.user) {
+                    throw new UnauthorizedError('Usuario no autenticado');
+                }
+
+                if (!roles.includes(req.user.role)) {
+                    throw new ForbiddenError('No tienes permiso para acceder a este recurso');
+                }
+
+                next();
+            } catch (error) {
+                return ErrorHandler.handle(error, res);
+
             }
 
-            if (!roles.includes(req.user.role)) {
-                throw new ForbiddenError('You do not have permission to access this resource');
-            }
-
-            next();
         };
     }
 
     static optionalAuth(req: Request, res: Response, next: NextFunction) {
         try {
             const token = AuthUtils.getTokenFromHeader(req.headers.authorization);
-            
+
             if (token) {
                 const decoded = AuthUtils.verifyToken(token);
                 req.user = decoded;
             }
-            
+
             next();
         } catch (error) {
             // En auth opcional, si hay error con el token, simplemente continuamos sin user
