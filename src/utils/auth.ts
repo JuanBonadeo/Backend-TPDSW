@@ -1,4 +1,3 @@
-// src/utils/auth.utils.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -21,7 +20,7 @@ export class AuthUtils {
     static generateToken(payload: JwtPayload): string {
         const secret = process.env.JWT_SECRET;
         if (!secret) {
-            throw new Error('JWT_SECRET environment variable is not defined');
+            throw new Error('La clave secreta JWT no está definida en las variables de entorno');
         }
         return jwt.sign(
             payload,

@@ -81,3 +81,5 @@
 {"error":{"name":"NotFoundError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:47:02.781Z"}
 {"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:47:20.278Z"}
 {"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:50:07.035Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:56:21.318Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:56:53.787Z"}
