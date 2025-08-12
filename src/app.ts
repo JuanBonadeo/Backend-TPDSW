@@ -24,11 +24,13 @@ app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
+app.use('/favourites', routerFavourites);
+app.use('/reviews', routerReviews);
+app.use('/auth', routerAuth);
+
 app.use('/movies', routerMovies);
 app.use('/categories', routerCategories);
 app.use('/actors', routerActors);
 app.use('/directors', routerDirectors);
 app.use('/movie-actors', routerMovieActors);
-app.use('/favourites', routerFavourites);
-app.use('/reviews', routerReviews);
-app.use('/auth', routerAuth);
+
