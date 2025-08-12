@@ -12,7 +12,6 @@ export const idUserParamsSchema = z
     .describe('ID del usuario');
 
 export const reviewZodSchema = z.object({
-    id_user: idUserParamsSchema,
     id_movie: idParamsSchema,
     score: z.number().refine(
         (val) => val >= 0 && val <= 5,
@@ -28,3 +27,10 @@ export const reviewUpdateZodSchema = reviewZodSchema.partial()
 export type CreateReviewDto = z.infer<typeof reviewZodSchema>;
 export type UpdateReviewDto = z.infer<typeof reviewUpdateZodSchema>;
 export type IdParamsSchema = z.infer<typeof idParamsSchema>;
+
+export interface ReviewData {
+    id_user: string;
+    id_movie: number;
+    score: number;
+    comment: string;
+}

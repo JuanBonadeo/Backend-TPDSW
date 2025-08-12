@@ -1,6 +1,7 @@
 import { Review } from '@prisma/client';
 import prisma from '../../db/db.js';
-import { CreateReviewDto, UpdateReviewDto } from './review.dtos.js';
+import {  ReviewData, UpdateReviewDto } from './review.dtos.js';
+
 
 export class ReviewDao {
     
@@ -67,7 +68,7 @@ export class ReviewDao {
         return result;
     }
 
-    async create(reviewData: CreateReviewDto): Promise<Review | null> {
+    async create(reviewData: ReviewData): Promise<Review | null> {
         const result = await prisma.review.create({
             data: reviewData,
         });

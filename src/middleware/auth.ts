@@ -19,7 +19,7 @@ export class AuthMiddleware {
             const token = AuthUtils.getTokenFromHeader(req.headers.authorization);
             
             if (!token) {
-                throw new UnauthorizedError('Token no proporcionado');
+                throw new UnauthorizedError('No token provided');
             }
 
             const decoded = AuthUtils.verifyToken(token);
@@ -27,10 +27,10 @@ export class AuthMiddleware {
             next();
         } catch (error) {
             if (error instanceof jwt.JsonWebTokenError) {
-                throw new UnauthorizedError('Token inválido');
+                throw new UnauthorizedError('Invalid token');
             }
             if (error instanceof jwt.TokenExpiredError) {
-                throw new UnauthorizedError('Token expirado');
+                throw new UnauthorizedError('Token expired');
             }
             return ErrorHandler.handle(error, res);
         }
@@ -39,11 +39,11 @@ export class AuthMiddleware {
     static authorize(roles: string[]) {
         return (req: Request, res: Response, next: NextFunction) => {
             if (!req.user) {
-                throw new UnauthorizedError('Usuario no autenticado');
+                throw new UnauthorizedError('User not authenticated');
             }
 
             if (!roles.includes(req.user.role)) {
-                throw new ForbiddenError('No tienes permiso para acceder a este recurso');
+                throw new ForbiddenError('You do not have permission to access this resource');
             }
 
             next();

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ReviewDao } from './review.dao.js';
 import { ResponseHandler } from '../../utils/ResponseHandler.js';
-import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
+import { ErrorHandler, NotFoundError, UnauthorizedError } from '../../utils/ErrorHandler.js';
 import { idParamsSchema, idUserParamsSchema, reviewUpdateZodSchema, reviewZodSchema } from './review.dtos.js';
 
 
@@ -38,8 +38,8 @@ export class ReviewController {
 
     async getReviewsByUserId(req: Request, res: Response) {
         try {
-            const idUser = idUserParamsSchema.parse(req.params.id);
-            const result = await this.dao.getReviewsByUserId(idUser);
+            const userId = idUserParamsSchema.parse(req.params.id);
+            const result = await this.dao.getReviewsByUserId(userId);
             if (!result) {
                 throw new NotFoundError();
             }
@@ -49,10 +49,25 @@ export class ReviewController {
         }
     }
 
+    async getMyReviews(req: Request, res: Response) {
+        try {
+            const userId = req.user!.userId; 
+            const result = await this.dao.getReviewsByUserId(userId);
+            return ResponseHandler.success(res, result);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
+        }
+    }
+
     async create(req: Request, res: Response) {
         try {
+            const userId = req.user!.userId; 
             const newReview = reviewZodSchema.parse(req.body);
-            const result = await this.dao.create(newReview);
+            const reviewData = {
+                ...newReview,
+                id_user: userId
+            };
+            const result = await this.dao.create(reviewData);
             return ResponseHandler.created(res, result);
         } catch (error) {
             return ErrorHandler.handle(error, res);
@@ -63,6 +78,15 @@ export class ReviewController {
         try {
             const id = idParamsSchema.parse(req.params.id);
             const updatedFavourite = reviewUpdateZodSchema.parse(req.body);
+
+            const review = await this.dao.getOne(id);
+            if (!review) {
+                throw new NotFoundError();
+            }
+            if (review.id_user !== req.user!.userId) {
+                throw new UnauthorizedError();
+            }
+            
             const result = await this.dao.update(id, updatedFavourite);
             if (!result) {
                 throw new NotFoundError();
@@ -75,8 +99,16 @@ export class ReviewController {
 
     async delete(req: Request, res: Response) {
         try {
-            const reviewId = idParamsSchema.parse(req.params.id);
-            await this.dao.delete(reviewId);
+            const id = idParamsSchema.parse(req.params.id);
+            const review = await this.dao.getOne(id);
+            if (!review) {
+                throw new NotFoundError();
+            }
+            if (review.id_user !== req.user!.userId && req.user!.role !== 'ADMIN') {
+                throw new UnauthorizedError();
+            }
+
+            await this.dao.delete(id);
             return ResponseHandler.deleted(res);
         } catch (error) {
             return ErrorHandler.handle(error, res);

@@ -72,3 +72,11 @@
 {"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:12:08.657Z"}
 {"error":{"name":"ForbiddenError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:12:30.333Z"}
 {"error":{"issues":[{"code":"invalid_type","expected":"number","message":"Required","path":["id_movie"],"received":"undefined"}],"name":"ZodError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:15:57.261Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:26:23.606Z"}
+{"error":{"name":"NotFoundError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:44:36.977Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:44:50.252Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:45:35.348Z"}
+{"error":{"issues":[{"code":"custom","message":"La puntuación debe estar entre 0 y 5","path":["score"]}],"name":"ZodError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:45:42.235Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:45:56.015Z"}
+{"error":{"name":"NotFoundError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:47:02.781Z"}
+{"error":{"name":"UnauthorizedError"},"level":"error","message":"Error atrapado por ErrorHandler","timestamp":"2025-08-12T13:47:20.278Z"}
