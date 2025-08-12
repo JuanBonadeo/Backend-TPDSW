@@ -1,7 +1,4 @@
 import express from 'express';
-import cors from 'cors';
-import { auth } from './utils/auth.js';
-import { toNodeHandler } from 'better-auth/node';
 import { router as routerCategories } from './modules/Categories/category.routes.js';
 import { router as routerMovies } from './modules/Movies/movie.routes.js';
 import { router as routerActors } from './modules/Actors/actor.routes.js';
@@ -13,15 +10,8 @@ import { router as routerReviews } from './modules/Review/review.routes.js';
 
 
 const app = express();
-app.use(
-    cors({
-        origin: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
-        credentials: true,
-    })
-);
+express.json();
 
-app.use(express.json());
-app.all('/api/auth/*', toNodeHandler(auth));
 
 app.get('/', (req, res) => {
     res.send('¡Servidor Express funcionando! 🚀');
@@ -40,5 +30,4 @@ app.use('/directors', routerDirectors);
 app.use('/movie-actors', routerMovieActors);
 app.use('/favourites', routerFavourites);
 app.use('/reviews', routerReviews);
-
 app.use('/auth', routerAuth);

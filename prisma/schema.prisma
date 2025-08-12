@@ -163,70 +163,29 @@ model Review {
 // }
 
 
-// BETTERAUTH MODELS
 
 model User {
   id            String     @id @default(cuid())
   name          String     @db.VarChar(100)
   email         String     @unique(map: "User_email_idx") @db.VarChar(255)
+  password      String     @db.VarChar(255) // Hash de la contraseña
   birth_date    DateTime?  @db.Date
-  created_at    DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at    DateTime?  @default(now()) @db.Timestamp(6)
+  role          UserRole   @default(USER)
+  isActive      Boolean    @default(true)
+  emailVerified Boolean    @default(false)
+  image         String?
+  created_at    DateTime   @default(now()) @db.Timestamp(6)
+  updated_at    DateTime   @updatedAt @db.Timestamp(6)
+  
+  // Relaciones existentes
   Favorite      Favorite[]
   Review        Review[]
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
 
   @@map("user")
 }
 
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  impersonatedBy String?
-
-  @@unique([token])
-  @@map("session")
-}
-
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime
-  updatedAt             DateTime
-
-  @@map("account")
-}
-
-model Verification {
-  id         String    @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime?
-  updatedAt  DateTime?
-
-  @@map("verification")
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
 }

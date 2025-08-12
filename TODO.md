@@ -11,13 +11,15 @@
 
 4. [x] Agregar paginación a listado anterior
 
-5. [x] Hacer la Auth, CRUD de usuarios
+5. [x] Hacer la Auth
+   
+6. [ ] CRUD de usuarios
 
-6. [x] CRUD de favoritos
+7. [x] CRUD de favoritos
 
-7. [x] CRUD de reseñas @Slashy Osea Yo
+8. [x] CRUD de reseñas @Slashy Osea Yo
 
-8. [x] Usar la API de IMDB para cargar toda la data en el seed
+9. [x] Usar la API de IMDB para cargar toda la data en el seed
 
 ## Manejo de Errores (PULIR)
 
@@ -30,6 +32,7 @@
 - [ ] **Verificar middleware** protege todas las rutas necesarias
 
 # 🎯 Para Aprobación Directa (OBLIGATORIO)
+
 
 ## Testing
 

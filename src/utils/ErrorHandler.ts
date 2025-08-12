@@ -31,6 +31,12 @@ export class ForbiddenError extends Error {
   }
 }
 
+export class ConflictError extends Error {
+  constructor(message = "Conflicto de datos") {
+    super(message);
+    this.name = "ConflictError";
+  }
+}
 
 
 interface ApiError {
