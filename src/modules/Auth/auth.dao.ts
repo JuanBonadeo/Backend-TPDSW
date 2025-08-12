@@ -19,10 +19,8 @@ export class AuthDAO {
     async createUser(userData: RegisterDto & { password: string }): Promise<User> { // todo
         return await prisma.user.create({
             data: {
-                name: userData.name,
-                email: userData.email,
-                password: userData.password,
-                birth_date: userData.birth_date ? new Date(userData.birth_date) : undefined,
+                ...userData,
+                birth_date: userData.birth_date ? new Date(userData.birth_date) : null,
             }
         });
     }

@@ -17,32 +17,25 @@ export class AuthController {
         try {
             const userData = registerSchema.parse(req.body);
             
-            // Verificar si el usuario ya existe
             const existingUser = await this.dao.findUserByEmail(userData.email);
             if (existingUser) {
                 throw new ConflictError('El usuario ya existe con este email');
             }
 
-            // Hashear la contraseña
             const hashedPassword = await AuthUtils.hashPassword(userData.password);
             
-            // Crear el usuario
             const newUser = await this.dao.createUser({
                 ...userData,
                 password: hashedPassword,
             });
 
-            // Generar token
             const token = AuthUtils.generateToken({
                 userId: newUser.id,
                 email: newUser.email,
-                role: newUser.role,
+                role: newUser.role ?? 'user',
             });
 
-            return ResponseHandler.created(res, {
-                user: newUser,
-                token,
-            }, 'Usuario registrado exitosamente');
+            return ResponseHandler.created(res, { user: newUser, token }, 'Usuario registrado exitosamente');
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }

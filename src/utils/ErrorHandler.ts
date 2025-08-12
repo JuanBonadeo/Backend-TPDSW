@@ -121,8 +121,9 @@ export class ErrorHandler {
     // Otro error genérico
     return res.status(500).json({
       success: false,
-      error: error,
-      code: 'INTERNAL_SERVER_ERROR'
+      error: (error instanceof Error) ? error.message : 'Error interno del servidor',
+      code: 'INTERNAL_SERVER_ERROR',
     });
+
   }
 }

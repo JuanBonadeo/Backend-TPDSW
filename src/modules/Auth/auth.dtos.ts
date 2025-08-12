@@ -7,7 +7,16 @@ export const registerSchema = z.object({
     password: z.string()
         .min(8, 'La contraseña debe tener al menos 8 caracteres')
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'La contraseña debe contener al menos una mayúscula, una minúscula y un número'),
-    birth_date: z.string().optional(),
+    birth_date: z.string()
+        .optional()
+        .transform((val) => {
+            if (!val) return undefined;
+            const date = new Date(val);
+            if (isNaN(date.getTime())) {
+                throw new Error('Fecha inválida');
+            }
+            return date;
+        }),
 });
 
 export const loginSchema = z.object({
@@ -24,10 +33,16 @@ export const changePasswordSchema = z.object({
 
 export const updateProfileSchema = z.object({
     name: z.string().min(1, 'El nombre es obligatorio').max(100, 'El nombre no puede exceder los 100 caracteres').optional(),
-    birth_date: z.string().optional().transform((val) => {
-        if (!val) return undefined;
-        return new Date(val);
-    }),
+    birth_date: z.string()
+        .optional()
+        .transform((val) => {
+            if (!val) return undefined;
+            const date = new Date(val);
+            if (isNaN(date.getTime())) {
+                throw new Error('Fecha inválida');
+            }
+            return date;
+        }),
     image: z.string().url('URL de imagen inválida').optional(),
 });
 
