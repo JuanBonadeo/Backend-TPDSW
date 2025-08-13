@@ -4,6 +4,7 @@ import { MovieDAO } from './movie.dao.js';
 import { idParamsSchema, movieZodSchema, movieZodSchemaQuery } from './movie.dtos.js';
 import { ResponseHandler } from '../../utils/ResponseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
+import { ResponseContextHelper } from '../../utils/responseContext.js';
 
 
 export class MovieController {
@@ -16,9 +17,9 @@ export class MovieController {
     async getAll(req: Request, res: Response) {
             try {
                 const result = await this.dao.getAll();
-                return ResponseHandler.success(res, result);
+                return ResponseHandler.success(res, result, 'Películas obtenidas exitosamente', 200, ResponseContextHelper.getContext(req));
             } catch (error) {
-                return ErrorHandler.handle(error, res);
+                return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
             }
         }
     
@@ -74,9 +75,17 @@ export class MovieController {
             if (!result) {
                 throw new NotFoundError('No se encontraron películas con los filtros proporcionados');
             }
-            return ResponseHandler.paginated(res, result.movies, result.movies.length, query.page, query.limit);
+            return ResponseHandler.paginated(
+                res, 
+                result.movies, 
+                result.movies.length, 
+                query.page, 
+                query.limit,
+                'Películas paginadas obtenidas exitosamente',
+                ResponseContextHelper.getContext(req)
+            );
         } catch (error) {
-           return ErrorHandler.handle(error, res);
+           return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
         }
     }
 }

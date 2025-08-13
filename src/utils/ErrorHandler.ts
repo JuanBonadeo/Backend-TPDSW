@@ -68,9 +68,21 @@ export class ErrorHandler {
     P2038: { status: 400, message: 'Error de integridad de transacción' },
   };
 
-  static handle(error: unknown, res: Response): Response {
-    // Loguea el error
-    logger.error("Error atrapado por ErrorHandler", { error });
+  static handle(error: unknown, res: Response, context?: { endpoint?: string, userId?: string, method?: string }): Response {
+    // Loguea el error con contexto adicional
+    logger.error("Error atrapado por ErrorHandler", { 
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error,
+      context: {
+        endpoint: context?.endpoint || 'unknown',
+        method: context?.method || 'unknown',
+        userId: context?.userId || 'anonymous',
+        timestamp: new Date().toISOString()
+      }
+    });
     // Errores de Prisma
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       const info = this.prismaErrorMessages[error.code] || {
