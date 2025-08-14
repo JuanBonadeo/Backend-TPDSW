@@ -7,6 +7,8 @@ import { AuthMiddleware } from '../../middleware/auth.js';
 export const router = Router();
 const controller = new ReviewController();
 
+router.use(AuthMiddleware.optionalAuth)
+
 router.get('/:id', (req: Request, res: Response) => controller.getOne(req, res));
 
 router.get('/movie/:id', (req: Request, res: Response) => controller.getReviewsByMovieId(req, res));

@@ -4,7 +4,6 @@ import { MovieDAO } from './movie.dao.js';
 import { idParamsSchema, movieZodSchema, movieZodSchemaQuery } from './movie.dtos.js';
 import { ResponseHandler } from '../../utils/ResponseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
-import { ResponseContextHelper } from '../../utils/responseContext.js';
 
 
 export class MovieController {
@@ -17,9 +16,9 @@ export class MovieController {
     async getAll(req: Request, res: Response) {
             try {
                 const result = await this.dao.getAll();
-                return ResponseHandler.success(res, result, 'Películas obtenidas exitosamente', 200, ResponseContextHelper.getContext(req));
+                return ResponseHandler.success(res, result);
             } catch (error) {
-                return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+                return ErrorHandler.handle(error, res);
             }
         }
     
@@ -81,11 +80,9 @@ export class MovieController {
                 result.movies.length, 
                 query.page, 
                 query.limit,
-                'Películas paginadas obtenidas exitosamente',
-                ResponseContextHelper.getContext(req)
             );
         } catch (error) {
-           return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+           return ErrorHandler.handle(error, res);
         }
     }
 }

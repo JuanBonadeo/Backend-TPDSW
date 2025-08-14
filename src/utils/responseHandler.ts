@@ -1,21 +1,20 @@
+// responseHandler.ts - Versión mejorada
 import { Response } from "express";
 import { logger } from "./logger.js";
-
-interface ResponseContext {
-    endpoint?: string;
-    method?: string;
-    userId?: string;
-    executionTime?: number;
-}
+import { getRequestContext, getExecutionTime } from '../middleware/contextMiddleware.js';
 
 export class ResponseHandler {
     private static logResponse(
+        res: Response,
         status: number, 
-        message: string, 
-        context?: ResponseContext,
-        dataSize?: number
+        message: string,
+        dataSize?: number,
+        additionalData?: any
     ) {
-        logger.info('Successful response sent', {
+        const context = getRequestContext(res);
+        const executionTime = getExecutionTime(context);
+        
+        logger.info('Response sent', {
             response: {
                 status,
                 message,
@@ -23,11 +22,15 @@ export class ResponseHandler {
                 timestamp: new Date().toISOString()
             },
             context: {
-                endpoint: context?.endpoint || 'unknown',
-                method: context?.method || 'unknown',
-                userId: context?.userId || 'anonymous',
-                executionTime: context?.executionTime ? `${context.executionTime}ms` : 'unknown'
-            }
+                requestId: context.requestId,
+                endpoint: context.endpoint,
+                method: context.method,
+                userId: context.userId,
+                userEmail: context.userEmail || 'N/A',
+                userRole: context.userRole || 'N/A',
+                executionTime: `${executionTime}ms`
+            },
+            ...additionalData
         });
     }
 
@@ -35,14 +38,10 @@ export class ResponseHandler {
         res: Response,
         data: T,
         message: string = 'Operación exitosa',
-        status: number = 200,
-        context?: ResponseContext
+        status: number = 200
     ): Response {
-        // Calcular tamaño aproximado de datos
         const dataSize = data ? JSON.stringify(data).length : 0;
-        
-        // Loguear la respuesta exitosa
-        this.logResponse(status, message, context, dataSize);
+        this.logResponse(res, status, message, dataSize);
         
         return res.status(status).json({
             success: true,
@@ -54,28 +53,24 @@ export class ResponseHandler {
     static created<T>(
         res: Response,
         data: T,
-        message: string = 'Recurso creado',
-        context?: ResponseContext
+        message: string = 'Recurso creado'
     ): Response {
-        return this.success(res, data, message, 201, context);
+        return this.success(res, data, message, 201);
     }
-    
+
     static updated<T>(
         res: Response,
         data: T,
-        message: string = 'Recurso actualizado',
-        context?: ResponseContext
+        message: string = 'Recurso actualizado'
     ): Response {
-        return this.success(res, data, message, 200, context);
+        return this.success(res, data, message, 200);
     }
-    
+
     static deleted(
         res: Response,
-        message: string = 'Recurso eliminado',
-        context?: ResponseContext
+        message: string = 'Recurso eliminado'
     ): Response {
-        // Loguear la respuesta de eliminación
-        this.logResponse(204, message, context, 0);
+        this.logResponse(res, 204, message, 0);
         
         return res.status(204).json({
             success: true,
@@ -83,38 +78,24 @@ export class ResponseHandler {
         });
     }
 
-    // Para respuestas paginadas
     static paginated<T>(
         res: Response,
         data: T[],
         total: number,
         page: number,
         pageSize: number,
-        message = 'Datos paginados obtenidos',
-        context?: ResponseContext
+        message = 'Datos paginados obtenidos'
     ): Response {
         const dataSize = JSON.stringify(data).length;
+        const totalPages = Math.ceil(total / pageSize);
         
-        // Loguear respuesta paginada con información adicional
-        logger.info('Paginated response sent', {
-            response: {
-                status: 200,
-                message,
-                dataSize,
-                recordsCount: data.length,
-                timestamp: new Date().toISOString()
-            },
+        this.logResponse(res, 200, message, dataSize, {
             pagination: {
                 total,
                 page,
                 pageSize,
-                totalPages: Math.ceil(total / pageSize)
-            },
-            context: {
-                endpoint: context?.endpoint || 'unknown',
-                method: context?.method || 'unknown',
-                userId: context?.userId || 'anonymous',
-                executionTime: context?.executionTime ? `${context.executionTime}ms` : 'unknown'
+                totalPages,
+                recordsCount: data.length
             }
         });
         
@@ -126,7 +107,7 @@ export class ResponseHandler {
                 total,
                 page,
                 pageSize,
-                totalPages: Math.ceil(total / pageSize)
+                totalPages
             }
         });
     }

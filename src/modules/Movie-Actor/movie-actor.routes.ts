@@ -6,6 +6,7 @@ import { AuthMiddleware } from '../../middleware/auth.js';
 export const router = Router();
 const controller = new MovieActorController();
 
+router.use(AuthMiddleware.optionalAuth)
 
 router.get('/movie/:movieId', (req: Request, res: Response) => controller.getActorsByMovie(req, res));
 

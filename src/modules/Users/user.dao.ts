@@ -1,4 +1,4 @@
-import prisma from '../db/db.js';
+import prisma from '../../db/db.js';
 import { User } from '@prisma/client';
 import { CreateUserDto, UpdateUserDto, UsersQueryDto, UserResponseDto, UsersListResponseDto } from './user.dtos.js';
 

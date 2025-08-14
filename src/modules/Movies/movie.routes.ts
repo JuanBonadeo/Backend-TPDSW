@@ -7,6 +7,8 @@ export const router = Router();
 
 const controller = new MovieController();
 
+router.use(AuthMiddleware.optionalAuth)
+
 router.get('/search', (req: Request, res: Response) => controller.listMovies(req, res));
 
 router.get('/', (req: Request, res: Response) => controller.getAll(req, res));

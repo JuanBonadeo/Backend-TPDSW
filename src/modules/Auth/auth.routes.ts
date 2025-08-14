@@ -8,6 +8,7 @@ export const router = Router();
 
 const controller = new AuthController();
 
+
 // Rutas públicas
 router.post('/register', (req: Request, res: Response) => controller.register(req, res));
 router.post('/login', (req: Request, res: Response) => controller.login(req, res));

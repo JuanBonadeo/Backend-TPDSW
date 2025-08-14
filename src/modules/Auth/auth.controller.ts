@@ -5,7 +5,6 @@ import { registerSchema, loginSchema, changePasswordSchema, updateProfileSchema 
 import { AuthUtils } from '../../utils/auth.js';
 import { ResponseHandler } from '../../utils/ResponseHandler.js';
 import { ErrorHandler, ConflictError, UnauthorizedError, NotFoundError } from '../../utils/ErrorHandler.js';
-import { ResponseContextHelper } from '../../utils/responseContext.js';
 
 export class AuthController {
     private dao: AuthDAO;
@@ -36,13 +35,9 @@ export class AuthController {
                 role: newUser.role ?? 'user',
             });
 
-            return ResponseHandler.created(res, { user: newUser, token }, 'Usuario registrado exitosamente', ResponseContextHelper.createContext(req, { endpoint: '/auth/register' }));
+            return ResponseHandler.created(res, { user: newUser, token });
         } catch (error) {
-            return ErrorHandler.handle(error, res, {
-                endpoint: '/auth/register',
-                method: 'POST',
-                userId: 'new_user'
-            });
+            return ErrorHandler.handle(error, res);
         }
     }
 
@@ -79,9 +74,9 @@ export class AuthController {
             return ResponseHandler.success(res, {
                 user: userWithoutPassword,
                 token,
-            }, 'Login exitoso', 200, ResponseContextHelper.createContext(req, { endpoint: '/auth/login' }));
+            }, 'Login exitoso', 200);
         } catch (error) {
-            return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+            return ErrorHandler.handle(error, res);
         }
     }
 
@@ -94,9 +89,9 @@ export class AuthController {
                 throw new NotFoundError('Usuario no encontrado');
             }
 
-            return ResponseHandler.success(res, user, undefined, 200, ResponseContextHelper.getContext(req));
+            return ResponseHandler.success(res, user);
         } catch (error) {
-            return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+            return ErrorHandler.handle(error, res);
         }
     }
 
@@ -106,10 +101,10 @@ export class AuthController {
             const updateData = updateProfileSchema.parse(req.body);
             
             const updatedUser = await this.dao.updateUser(userId, updateData);
-            
-            return ResponseHandler.success(res, updatedUser, 'Perfil actualizado exitosamente', 200, ResponseContextHelper.getContext(req));
+
+            return ResponseHandler.success(res, updatedUser, 'Perfil actualizado exitosamente', 200);
         } catch (error) {
-            return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+            return ErrorHandler.handle(error, res);
         }
     }
 
@@ -136,9 +131,9 @@ export class AuthController {
             // Actualizar contraseña
             await this.dao.updatePassword(userId, hashedNewPassword);
 
-            return ResponseHandler.success(res, null, 'Contraseña cambiada exitosamente', 200, ResponseContextHelper.getContext(req));
+            return ResponseHandler.success(res, null, 'Contraseña cambiada exitosamente', 200);
         } catch (error) {
-            return ErrorHandler.handle(error, res, ResponseContextHelper.getContext(req));
+            return ErrorHandler.handle(error, res);
         }
     }
 }

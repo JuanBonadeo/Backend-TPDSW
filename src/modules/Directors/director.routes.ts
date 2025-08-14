@@ -7,6 +7,8 @@ export const router = Router();
 
 const controller = new DirectorController();
 
+router.use(AuthMiddleware.optionalAuth)
+
 router.get('/', (req: Request, res: Response) => controller.getAll(req, res));
 
 router.get('/:id', (req: Request, res: Response) => controller.getOne(req, res));

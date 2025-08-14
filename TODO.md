@@ -13,7 +13,7 @@
 
 5. [x] Hacer la Auth
    
-6. [ ] CRUD de usuarios
+6. [x] CRUD de usuarios
 
 7. [x] CRUD de favoritos
 
@@ -23,13 +23,13 @@
 
 ## Manejo de Errores (PULIR)
 
-1.  [ ] **Logging de errores** para debugging con winston
-2.  [ ] **Middelware de manejo de errores**
+1.  [x] **Logging de errores** para debugging con winston
+2.  [x] **Middelware de manejo de errores**
 
-## Better-Auth (VERIFICAR FUNCIONAMIENTO)
+## Auth (VERIFICAR FUNCIONAMIENTO)
 
-- [ ] **Agregar role (user, admin)**
-- [ ] **Verificar middleware** protege todas las rutas necesarias
+- [x] **Agregar role (user, admin)**
+- [x] **Verificar middleware** protege todas las rutas necesarias
 
 # 🎯 Para Aprobación Directa (OBLIGATORIO)
 
