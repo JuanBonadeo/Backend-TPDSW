@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserDAO } from './user.dao.js';
 import { createUserSchema, updateUserSchema, toggleUserStatusSchema, userIdParamsSchema, usersQuerySchema } from './user.dtos.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, ConflictError, NotFoundError, ForbiddenError, BadRequestError } from '../../utils/ErrorHandler.js';
 import { AuthUtils } from '../../utils/auth.js';
 

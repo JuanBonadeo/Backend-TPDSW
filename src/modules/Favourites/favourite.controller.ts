@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { FavouriteDAO } from './favourite.dao.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError, ForbiddenError } from '../../utils/ErrorHandler.js';
 import { 
     favouriteZodSchema, 

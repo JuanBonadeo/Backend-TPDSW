@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { DirectorDAO } from './director.dao.js';
 import { CreateDirectorDto, directorZodSchema, idParamsSchema, updateDirectorZodSchema } from './director.dtos.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
 
 

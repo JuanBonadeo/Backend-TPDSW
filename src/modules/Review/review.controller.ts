@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ReviewDao } from './review.dao.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError, UnauthorizedError } from '../../utils/ErrorHandler.js';
 import { idParamsSchema, idUserParamsSchema, reviewUpdateZodSchema, reviewZodSchema } from './review.dtos.js';
 

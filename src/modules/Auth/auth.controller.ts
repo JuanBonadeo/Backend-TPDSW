@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { AuthDAO } from './auth.dao.js';
 import { registerSchema, loginSchema, changePasswordSchema, updateProfileSchema } from './auth.dtos.js';
 import { AuthUtils } from '../../utils/auth.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, ConflictError, UnauthorizedError, NotFoundError } from '../../utils/ErrorHandler.js';
 
 export class AuthController {

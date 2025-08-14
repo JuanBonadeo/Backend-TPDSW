@@ -1,7 +1,7 @@
 import { ActorDAO } from './actor.dao.js';
 import { Request, Response } from 'express';
 import { actorZodSchema, idParamsSchema, updateActorZodSchema } from './actor.dtos.js';
-import { ResponseHandler } from '../../utils/ResponseHandler.js';
+import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
 
 export class ActorController {

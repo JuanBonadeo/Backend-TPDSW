@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { CategoryDAO } from './category.dao.js';
 import { categoryZodSchema, idParamsSchema, updateCategoryZodSchema } from './category.dtos.js';
-import * as ResponseHandler from '../../utils/ResponseHandler.js';
+import * as ResponseHandler from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
 
 export class CategoryController {
