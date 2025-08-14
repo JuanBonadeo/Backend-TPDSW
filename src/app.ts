@@ -7,6 +7,7 @@ import { router as routerMovieActors } from './modules/Movie-Actor/movie-actor.r
 import { router as routerAuth } from './modules/Auth/auth.routes.js';
 import { router as routerFavourites } from './modules/Favourites/favourite.routes.js';
 import { router as routerReviews } from './modules/Review/review.routes.js';
+import { router as routerUsers } from './Users/user.routes.js';
 import { ErrorLoggerMiddleware } from './middleware/errorLogger.js';
 import { logger } from './utils/logger.js';
 
@@ -33,6 +34,7 @@ app.listen(PORT, () => {
 app.use('/favourites', routerFavourites);
 app.use('/reviews', routerReviews);
 app.use('/auth', routerAuth);
+app.use('/users', routerUsers);
 
 app.use('/movies', routerMovies);
 app.use('/categories', routerCategories);
