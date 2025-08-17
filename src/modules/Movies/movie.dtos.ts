@@ -45,6 +45,7 @@ export type MovieParams = z.infer<typeof idParamsSchema>;
 export interface movieList {
     currentPage: number;
     totalPages: number;
+    total: number;
     movies: Movie[];
 }
 export interface MovieFilters {
