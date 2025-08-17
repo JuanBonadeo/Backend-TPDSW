@@ -84,6 +84,7 @@ export class MovieDAO {
         return {
             currentPage: query.page,
             totalPages: Math.ceil(totalMovies / query.limit),
+            total: totalMovies,
             movies,
         };
     }
