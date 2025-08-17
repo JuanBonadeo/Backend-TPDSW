@@ -75,10 +75,10 @@ export class MovieController {
                 throw new NotFoundError('No se encontraron películas con los filtros proporcionados');
             }
             return ResponseHandler.paginated(
-                res, 
-                result.movies, 
-                result.movies.length, 
-                query.page, 
+                res,
+                result.movies,
+                result.total,
+                query.page,
                 query.limit,
             );
         } catch (error) {
