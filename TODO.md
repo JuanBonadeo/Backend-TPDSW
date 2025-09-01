@@ -20,6 +20,8 @@
 8. [x] CRUD de reseñas @Slashy Osea Yo
 
 9. [x] Usar la API de IMDB para cargar toda la data en el seed
+ 
+10. [ ] CRUD Watched films
 
 ## Manejo de Errores (PULIR)
 

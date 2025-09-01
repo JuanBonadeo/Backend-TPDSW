@@ -35,7 +35,7 @@ export class AuthController {
                 role: newUser.role ?? 'user',
             });
 
-            return ResponseHandler.created(res, { user: newUser, token });
+            return ResponseHandler.success(res, { user: newUser, token });
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }

@@ -13,6 +13,17 @@ export class AuthDAO {
     async findUserById(id: string): Promise<User | null> {
         return await prisma.user.findUnique({
             where: { id },
+            include: { 
+                Favorite: {
+                    include: {Movie: true}
+                },
+                Review: {
+                    include: {Movie: true}
+                },
+                _count: { select: { Favorite: true, Review: true } }
+
+            },
+
         });
     }
 
