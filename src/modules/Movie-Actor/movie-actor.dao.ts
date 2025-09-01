@@ -20,19 +20,15 @@ export class MovieActorDAO {
         return result;
     }
 
-    async getMoviesByActorId(actorId: number): Promise<Movie_Actor[] | null> {
+    async getMoviesByActorId(actorId: number): Promise<any[] | null> {
         const result = await prisma.movie_Actor.findMany({
             where: { id_actor: actorId },
-            include: {
-                Movie: {
-                    select: {
-                        id_movie: true,
-                        title: true,
-                    },
-                },
+            select: {
+                Movie: true,
             },
         });
-        return result;
+        // Devuelve solo la data de la película
+        return result.map(item => item.Movie);
     }
 
     async create(movieActor: CreateMovieActorDto): Promise<Movie_Actor | null> {

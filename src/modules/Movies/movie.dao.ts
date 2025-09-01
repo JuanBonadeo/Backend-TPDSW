@@ -19,6 +19,11 @@ export class MovieDAO {
             include: {
                 Category: true,
                 Director: true,
+                Movie_Actor: {
+                    include: {
+                        Actor: true,
+                    },
+                },
             },
         });
         return movie;

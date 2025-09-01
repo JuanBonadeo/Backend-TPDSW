@@ -120,7 +120,6 @@ model Review {
   Movie       Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
   User        User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([id_user, id_movie], map: "Review_id_user_id_movie_idx")
 }
 
 

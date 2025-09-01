@@ -10,11 +10,13 @@ import { router as routerReviews } from './modules/Review/review.routes.js';
 import { router as routerUsers } from './modules/Users/user.routes.js';
 import { logger } from './utils/logger.js';
 import { contextMiddleware } from './middleware/contextMiddleware.js';
+import cors from "cors";
 
 
 const app = express();
 
 // Middleware de logging de requests
+app.use(cors({ origin: "http://localhost:3000" })); // tu frontend
 
 
 app.use(express.json());
@@ -26,32 +28,32 @@ app.get('/', (req, res) => {
     res.send('¡Servidor Express funcionando! 🚀');
 });
 
-const PORT = 3000;
+const PORT = 3001;
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
-app.use('/favourites', routerFavourites);
-app.use('/reviews', routerReviews);
-app.use('/auth', routerAuth);
-app.use('/users', routerUsers);
+app.use('/api/favourites', routerFavourites);
+app.use('/api/reviews', routerReviews);
+app.use('/api/auth', routerAuth);
+app.use('/api/users', routerUsers);
 
-app.use('/movies', routerMovies);
-app.use('/categories', routerCategories);
-app.use('/actors', routerActors);
-app.use('/directors', routerDirectors);
-app.use('/movie-actors', routerMovieActors);
+app.use('/api/movies', routerMovies);
+app.use('/api/categories', routerCategories);
+app.use('/api/actors', routerActors);
+app.use('/api/directors', routerDirectors);
+app.use('/api/movie-actors', routerMovieActors);
 
 
 
 // Capturar errores no manejados de Node.js
-process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception', { error: { name: error.name, message: error.message, stack: error.stack } });
-    process.exit(1);
-});
+// process.on('uncaughtException', (error) => {
+//     logger.error('Uncaught Exception', { error: { name: error.name, message: error.message, stack: error.stack } });
+//     process.exit(1);
+// });
 
-process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Rejection at Promise', { reason, promise });
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//     logger.error('Unhandled Rejection at Promise', { reason, promise });
+// });
 

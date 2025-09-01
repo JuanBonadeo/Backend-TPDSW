@@ -10,7 +10,7 @@ export class ActorDAO {
 
     async getOne(id: number): Promise<Actor | null> {
         const actor = await prisma.actor.findUnique({
-            where: { id_actor: id },
+            where: { id_actor: id }
         });
         return actor;
     }
