@@ -107,4 +107,21 @@ export class FavouriteController {
             return ErrorHandler.handle(error, res);
         }
     }
+
+    async isFavourite(req: Request, res: Response) {
+        try {
+            const { id_movie } = favouriteZodSchema.parse(req.params);
+            const userId = req.user!.userId;
+
+            const favouriteData = {
+                id_user: userId,
+                id_movie: id_movie
+            };
+
+            const existingFavourite = await this.dao.getOne(favouriteData);
+            return ResponseHandler.success(res, { isFavourite: !!existingFavourite });
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
+        }
+    }
 }

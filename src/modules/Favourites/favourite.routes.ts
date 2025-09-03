@@ -17,3 +17,5 @@ router.get('/user/:id_user', (req: Request, res: Response) => controller.getFavo
 router.delete('/', (req: Request, res: Response) => controller.delete(req, res));
 
 router.put('/toggle', (req: Request, res: Response) => controller.toggleFavourite(req, res));
+
+router.get('/:id_movie', (req: Request, res: Response) => controller.isFavourite(req, res));
