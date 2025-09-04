@@ -1,5 +1,5 @@
 import prisma from '../../db/db.js';
-import { Director } from '@prisma/client';
+import { Director, Movie } from '@prisma/client';
 import { CreateDirectorDto, UpdateDirectorDto } from './director.dtos.js';
 
 export class DirectorDAO {
@@ -11,6 +11,15 @@ export class DirectorDAO {
     async getOne(id: number): Promise<Director | null> {
         const director = await prisma.director.findUnique({
             where: { id_director: id },
+            include: { Movie: {
+                select: {
+                    id_movie: true,
+                    title: true,
+                    release_date: true,
+                    rating: true,
+                    poster_path: true,
+                },
+            }},
         });
         return director;
     }

@@ -4,6 +4,7 @@ import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError, ForbiddenError } from '../../utils/ErrorHandler.js';
 import { 
     favouriteZodSchema, 
+    idParamsSchema, 
     idUserParamsSchema, 
     toggleFavouriteSchema 
 } from './favourite.dtos.js';
@@ -110,9 +111,9 @@ export class FavouriteController {
 
     async isFavourite(req: Request, res: Response) {
         try {
-            const { id_movie } = favouriteZodSchema.parse(req.params);
+            const  id_movie = idParamsSchema.parse(req.params.id_movie);
             const userId = req.user!.userId;
-
+            
             const favouriteData = {
                 id_user: userId,
                 id_movie: id_movie

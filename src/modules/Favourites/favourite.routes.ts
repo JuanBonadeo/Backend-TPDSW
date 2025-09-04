@@ -8,6 +8,8 @@ const controller = new FavouriteController();
 
 router.use(AuthMiddleware.authenticate);
     
+router.get('/isFavourite/:id_movie', (req: Request, res: Response) => controller.isFavourite(req, res));
+
 router.post('/', (req: Request, res: Response) => controller.create(req, res));
 
 router.get('/', (req: Request, res: Response) => controller.getMyFavourites(req, res));
