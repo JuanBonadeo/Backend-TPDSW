@@ -72,11 +72,9 @@ export class MovieDAO {
 
     async listMovies(query: MovieQueryDto): Promise<movieList | null> {
         const where: any = {
+            ...(query.title && { title: { contains: query.title, mode: 'insensitive' } }),
             ...(query.categoryId && { id_category: query.categoryId }),
-            ...(query.directorId && { id_director: query.directorId }),
-            ...(query.actorId && {
-                actors: { some: { id_actor: query.actorId } },
-            }),
+
         };
 
         const movies = await prisma.movie.findMany({
