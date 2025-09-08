@@ -1,4 +1,4 @@
-// prisma/seed.ts
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -140,12 +140,25 @@ function extractNationality(birthPlace: string | null): string | null {
     return countryMap[country] || country;
 }
 
-// Función para limpiar datos existentes (opcional)
 async function cleanDatabase(): Promise<void> {
     console.log('🧹 Limpiando base de datos...');
-
-    console.log('✅ Base de datos limpiada');
-}
+    await prisma.review.deleteMany({});
+    await prisma.favorite.deleteMany({});
+    await prisma.movie_Actor.deleteMany({});
+    await prisma.actor.deleteMany({});
+    await prisma.movie.deleteMany({});
+    await prisma.director.deleteMany({});
+    await prisma.category.deleteMany({});
+    
+    // Reiniciar contadores de autoincrement en PostgreSQL
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Movie"', 'id_movie'), 1, false)`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Category"', 'id_category'), 1, false)`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Director"', 'id_director'), 1, false)`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Actor"', 'id_actor'), 1, false)`;
+    await prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"Review"', 'id_review'), 1, false)`;
+    
+    console.log('✅ Base de datos limpiada y contadores reiniciados');
+}// prisma/seed.ts
 
 // Función para obtener y crear géneros
 async function seedGenres(): Promise<any[]> {
@@ -315,93 +328,125 @@ async function getMovieDetails(movieId: number): Promise<TMDBMovieDetails> {
 
 // Función principal para crear películas
 async function seedMovies(genres: any[]): Promise<any[]> {
-    console.log('🎭 Seeding movies...');
+    console.log('🎭 Seeding 300 películas más populares (sin contenido adulto)...');
 
     const moviesCreated: any[] = [];
+    const TARGET_MOVIES = 300;
+    const MOVIES_PER_PAGE = 20; // TMDB devuelve 20 películas por página
+    let page = 1;
 
-    // Obtener películas populares de diferentes páginas para tener variedad
-    for (let page = 1; page <= 4; page++) {
-        const moviesData: TMDBMoviesResponse = await fetchTMDB(`/movie/popular?page=${page}`);
+    while (moviesCreated.length < TARGET_MOVIES) {
+        try {
+            console.log(`📄 Obteniendo página ${page} de películas populares (discover)...`);
+            
+            // Usar discover/movie con filtros ya aplicados
+            const endpoint = `/discover/movie?include_adult=false&include_video=false&language=en-US&page=${page}&sort_by=revenue.desc`;
+            const moviesData: TMDBMoviesResponse = await fetchTMDB(endpoint);
+            
+            if (!moviesData.results || moviesData.results.length === 0) {
+                console.log(`⚠️ No hay más películas en la página ${page}`);
+                break;
+            }
 
-        for (const movie of moviesData.results.slice(0, 18)) {
-            // ~18 películas por página
-            if (moviesCreated.length >= 70) break;
+            for (const movie of moviesData.results) {
+                if (moviesCreated.length >= TARGET_MOVIES) break;
 
-            // Verificar si la película ya existe
-            const existingMovie = await prisma.movie.findUnique({
-                where: { tmdb_id: movie.id },
-            });
-
-            if (existingMovie) continue;
-
-            try {
-                console.log(`📽️ Procesando: ${movie.title}`);
-
-                // Obtener detalles completos de la película
-                const movieDetails: TMDBMovieDetails = await getMovieDetails(movie.id);
-
-                // Encontrar la categoría principal (primer género)
-                const primaryGenre: TMDBGenre | undefined = movieDetails.genres[0];
-                const category = genres.find(g => g.tmdb_id === primaryGenre?.id) || genres[0];
-
-                // Obtener director
-                const director = await getMovieDirector(movie.id);
-
-                // Crear la película
-                const createdMovie = await prisma.movie.create({
-                    data: {
-                        title: movie.title,
-                        description: movie.overview,
-                        duration: movieDetails.runtime,
-                        release_date: movie.release_date ? new Date(movie.release_date).getFullYear() : 0,
-                        rating: movie.vote_average,
-                        tmdb_id: movie.id,
-                        poster_path: movie.poster_path,
-                        backdrop_path: movie.backdrop_path,
-                        original_language: movie.original_language,
-                        vote_count: movie.vote_count,
-                        popularity: movie.popularity,
-                        adult: movie.adult,
-                        id_director: director.id_director,
-                        id_category: category.id_category,
-                    },
+                // Verificar si la película ya existe
+                const existingMovie = await prisma.movie.findUnique({
+                    where: { tmdb_id: movie.id },
                 });
 
-                // Obtener y crear actores
-                const actors: ActorWithRole[] = await getMovieActors(movie.id);
-
-                for (const actorData of actors) {
-                    await prisma.movie_Actor.create({
-                        data: {
-                            id_movie: createdMovie.id_movie,
-                            id_actor: actorData.actor.id_actor,
-                            role: 'Actor',
-                            character: actorData.character,
-                            order: actorData.order,
-                        },
-                    });
+                if (existingMovie) {
+                    console.log(`⏭️ Película ya existe: ${movie.title}`);
+                    continue;
                 }
 
-                moviesCreated.push(createdMovie);
+                try {
+                    console.log(`📽️ Procesando (${moviesCreated.length + 1}/${TARGET_MOVIES}): ${movie.title}`);
 
-                // Pequeña pausa para no sobrecargar la API
-                await new Promise(resolve => setTimeout(resolve, 250));
-            } catch (error: any) {
-                console.error(`❌ Error procesando película ${movie.title}:`, error.message);
+                    // Obtener detalles completos de la película
+                    const movieDetails: TMDBMovieDetails = await getMovieDetails(movie.id);
+
+                    // Encontrar la categoría principal (primer género)
+                    const primaryGenre: TMDBGenre | undefined = movieDetails.genres[0];
+                    const category = genres.find(g => g.tmdb_id === primaryGenre?.id) || genres[0];
+
+                    // Obtener director
+                    const director = await getMovieDirector(movie.id);
+
+                    // Crear la película
+                    const createdMovie = await prisma.movie.create({
+                        data: {
+                            title: movie.title,
+                            description: movie.overview || '',
+                            duration: movieDetails.runtime || 0,
+                            release_date: movie.release_date ? new Date(movie.release_date).getFullYear() : 0,
+                            rating: movie.vote_average,
+                            tmdb_id: movie.id,
+                            poster_path: movie.poster_path,
+                            backdrop_path: movie.backdrop_path,
+                            original_language: movie.original_language,
+                            vote_count: movie.vote_count,
+                            popularity: movie.popularity,
+                            adult: false, // Ya está filtrado por el endpoint
+                            id_director: director.id_director,
+                            id_category: category.id_category,
+                        },
+                    });
+
+                    // Obtener y crear actores
+                    const actors: ActorWithRole[] = await getMovieActors(movie.id);
+
+                    for (const actorData of actors) {
+                        await prisma.movie_Actor.create({
+                            data: {
+                                id_movie: createdMovie.id_movie,
+                                id_actor: actorData.actor.id_actor,
+                                role: 'Actor',
+                                character: actorData.character,
+                                order: actorData.order,
+                            },
+                        });
+                    }
+
+                    moviesCreated.push(createdMovie);
+                    console.log(`✅ Película creada: ${movie.title} (${moviesCreated.length}/${TARGET_MOVIES})`);
+
+                    // Pausa para no sobrecargar la API
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                } catch (error: any) {
+                    console.error(`❌ Error procesando película ${movie.title}:`, error.message);
+                    // Continuar con la siguiente película en caso de error
+                    continue;
+                }
+            }
+
+            page++;
+            
+            // Pausa entre páginas
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+        } catch (error: any) {
+            console.error(`❌ Error obteniendo página ${page}:`, error.message);
+            page++;
+            
+            // Si hay muchos errores consecutivos, salir del bucle
+            if (page > 50) {
+                console.error('❌ Demasiados errores, deteniendo la carga de películas');
+                break;
             }
         }
-
-        if (moviesCreated.length >= 70) break;
     }
 
-    console.log(`✅ ${moviesCreated.length} películas creadas`);
+    console.log(`✅ ${moviesCreated.length} películas populares creadas de un objetivo de ${TARGET_MOVIES}`);
     return moviesCreated;
 }
 
 // Función principal
 async function main(): Promise<void> {
     try {
-        console.log('🚀 Iniciando seed de la base de datos...');
+        console.log('🚀 Iniciando seed de la base de datos con 300 películas populares...');
 
         // Uncomment this line if you want to clean the database before seeding
         await cleanDatabase();
