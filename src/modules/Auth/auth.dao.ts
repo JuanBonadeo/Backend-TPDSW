@@ -1,6 +1,6 @@
 
 import prisma from '../../db/db.js';
-import { User, ToWatch } from '@prisma/client';
+import { User } from '@prisma/client';
 import { RegisterDto, UpdateProfileDto } from './auth.dtos.js';
 
 export class AuthDAO {
