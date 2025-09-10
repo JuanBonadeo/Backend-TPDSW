@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ToWatchDAO } from './toWatch.dao.js';
 import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError, ForbiddenError } from '../../utils/ErrorHandler.js';
-import { toWatchZodSchema, idParamsSchema, idUserParamsSchema, toggleToWatchSchema } from './toWatch.dtos';
+import { toWatchZodSchema, idParamsSchema, idUserParamsSchema, toggleToWatchSchema } from './toWatch.dtos.js';
 
 export class ToWatchController {
     private dao: ToWatchDAO;
