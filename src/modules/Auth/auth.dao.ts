@@ -1,6 +1,6 @@
 
 import prisma from '../../db/db.js';
-import { User } from '@prisma/client';
+import { User, ToWatch } from '@prisma/client';
 import { RegisterDto, UpdateProfileDto } from './auth.dtos.js';
 
 export class AuthDAO {
@@ -18,6 +18,9 @@ export class AuthDAO {
                     include: {Movie: true}
                 },
                 Review: {
+                    include: {Movie: true}
+                },
+                ToWatch: {
                     include: {Movie: true}
                 },
                 _count: { select: { Favorite: true, Review: true } }
