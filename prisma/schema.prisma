@@ -8,44 +8,38 @@ datasource db {
 }
 
 model Movie {
-  id_movie Int @id @default(autoincrement())
-
-  // Campos integrados con TMDB
-  title             String  @unique(map: "Movie_title_idx") @db.VarChar(200)
-  description       String? @db.VarChar(1000)
+  id_movie          Int           @id @default(autoincrement())
+  title             String        @unique(map: "Movie_title_idx") @db.VarChar(200)
+  description       String?       @db.VarChar(1000)
   duration          Int
   release_date      Int
-  averageScore      Decimal? @db.Decimal(3, 2) // puntuacion propia (0-5)
-  totalReviews      Int?     @default(0) 
-  // Campos adicionales de TMDB
-  tmdb_id           Int?    @unique // ID de TMDB para sincronización
-  rating            Float?  @default(0) // vote_average de TMDB (0-10)
-  poster_path       String? @db.VarChar(500)
-  backdrop_path     String? @db.VarChar(500)
-  original_language String? @db.VarChar(10)
-  vote_count        Int?    @default(0)
-  popularity        Float?  @default(0)
-  adult             Boolean @default(false)
-
-  id_director Int
-  id_category Int
-
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
-  Favorite    Favorite[]
-  ToWatch     ToWatch[]
-  Movie_Actor Movie_Actor[]
-  Review      Review[]
-
-  Category Category @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
-  Director Director @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
+  rating            Float?        @default(0)
+  tmdb_id           Int?          @unique
+  poster_path       String?       @db.VarChar(500)
+  backdrop_path     String?       @db.VarChar(500)
+  original_language String?       @db.VarChar(10)
+  vote_count        Int?          @default(0)
+  popularity        Float?        @default(0)
+  adult             Boolean       @default(false)
+  id_director       Int
+  id_category       Int
+  created_at        DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?     @default(now()) @db.Timestamp(6)
+  averageScore      Decimal?      @db.Decimal(3, 2)
+  totalReviews      Int?          @default(0)
+  Favorite          Favorite[]
+  Category          Category      @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
+  Director          Director      @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
+  Movie_Actor       Movie_Actor[]
+  Review            Review[]
+  ToWatch           ToWatch[]
 }
 
 model Category {
   id_category Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(50) // nombre del género de TMDB
-  description String? // descripción generada
-  tmdb_id     Int?      @unique // ID de género en TMDB para sincronización
+  name        String    @unique @db.VarChar(50)
+  description String?
+  tmdb_id     Int?      @unique
   created_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie[]
 }
@@ -54,11 +48,10 @@ model Director {
   id_director  Int       @id @default(autoincrement())
   first_name   String    @db.VarChar(100)
   last_name    String    @db.VarChar(100)
-  nationality  String?   @db.VarChar(50) // extraído de place_of_birth
-  // Campos adicionales integrados de TMDB
-  tmdb_id      Int?      @unique // ID de persona en TMDB
+  nationality  String?   @db.VarChar(50)
+  tmdb_id      Int?      @unique
   profile_path String?   @db.VarChar(500)
-  biography    String?   @db.Text
+  biography    String?
   birth_date   DateTime? @db.Date
   birth_place  String?   @db.VarChar(200)
   created_at   DateTime? @default(now()) @db.Timestamp(6)
@@ -72,12 +65,11 @@ model Actor {
   first_name   String        @db.VarChar(100)
   last_name    String        @db.VarChar(100)
   birth_date   DateTime?     @db.Date
-  // Campos adicionales integrados de TMDB
-  tmdb_id      Int?          @unique // ID de persona en TMDB
+  tmdb_id      Int?          @unique
   profile_path String?       @db.VarChar(500)
-  biography    String?       @db.Text
+  biography    String?
   birth_place  String?       @db.VarChar(200)
-  gender       Int? // 1 = femenino, 2 = masculino, 0 = no especificado
+  gender       Int?
   created_at   DateTime?     @default(now()) @db.Timestamp(6)
   Movie_Actor  Movie_Actor[]
 
@@ -95,7 +87,6 @@ model Favorite {
   @@index([id_movie, id_user])
 }
 
-
 model ToWatch {
   id_user    String
   id_movie   Int
@@ -105,18 +96,17 @@ model ToWatch {
 
   @@id([id_user, id_movie])
   @@index([id_movie, id_user])
-} 
+}
 
 model Movie_Actor {
   id_movie   Int
   id_actor   Int
-  role       String?   @db.VarChar(100) // tipo de rol (ej: "Actor", "Actress")
-  character  String?   @db.VarChar(200) // nombre del personaje
-  order      Int? // orden en los créditos
+  role       String?   @db.VarChar(100)
+  character  String?   @db.VarChar(200)
+  order      Int?
   created_at DateTime? @default(now()) @db.Timestamp(6)
-
-  Actor Actor @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
-  Movie Movie @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  Actor      Actor     @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
+  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_movie, id_actor])
   @@index([role])
@@ -126,74 +116,30 @@ model Review {
   id_review   Int       @id @default(autoincrement())
   id_user     String
   id_movie    Int
-  score       Decimal? @db.Decimal(3, 2) // puntuación del usuario (0-5)
+  score       Decimal?  @db.Decimal(3, 2)
   comment     String?
   review_date DateTime? @default(now()) @db.Timestamp(6)
   updated_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
   User        User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
 }
-
-
-// model Comment {
-//   id              Int        @id @default(autoincrement())
-//   text            String
-//   createdAt       DateTime   @default(now())
-//   updatedAt       DateTime   @updatedAt
-
-//   // Relaciones
-//   review          Review     @relation(fields: [reviewId], references: [id])
-//   reviewId        Int
-
-//   author          User?      @relation(fields: [authorId], references: [id])
-//   authorId        Int?
-
-//   parentComment   Comment?   @relation("CommentReplies", fields: [parentCommentId], references: [id])
-//   parentCommentId Int?
-
-//   replies         Comment[]  @relation("CommentReplies") // hijos
-
-//   votes           CommentVote[]
-// }
-
-// PARA AD LIKE DISLIKE
-
-// model CommentVote {
-//   id         Int      @id @default(autoincrement())
-//   comment    Comment  @relation(fields: [commentId], references: [id])
-//   commentId  Int
-
-//   user       User     @relation(fields: [userId], references: [id])
-//   userId     Int
-
-//   value      Int      // 1 para like, -1 para dislike
-
-//   createdAt  DateTime @default(now())
-
-//   @@unique([commentId, userId]) // un voto por usuario por comentario
-// }
-
-
 
 model User {
   id            String     @id @default(cuid())
   name          String     @db.VarChar(100)
   email         String     @unique(map: "User_email_idx") @db.VarChar(255)
-  password      String     @db.VarChar(255) // Hash de la contraseña
   birth_date    DateTime?  @db.Date
-  role          UserRole   @default(USER)
-  isActive      Boolean    @default(true)
-  emailVerified Boolean    @default(false)
-  image         String?    @default("avatar")
-  bio           String?    @db.VarChar(500)
   created_at    DateTime   @default(now()) @db.Timestamp(6)
   updated_at    DateTime   @updatedAt @db.Timestamp(6)
-  
-  // Relaciones existentes
+  emailVerified Boolean    @default(false)
+  image         String?    @default("avatar")
+  isActive      Boolean    @default(true)
+  password      String     @db.VarChar(255)
+  role          UserRole   @default(USER)
+  bio           String?    @db.VarChar(500)
   Favorite      Favorite[]
-  ToWatches       ToWatch[]
   Review        Review[]
+  ToWatch       ToWatch[]
 
   @@map("user")
 }

@@ -20,7 +20,7 @@ export class AuthDAO {
                 Review: {
                     include: {Movie: true}
                 },
-                ToWatches: {
+                ToWatch: {
                     include: {Movie: true}
                 },
                 _count: { select: { Favorite: true, Review: true } }
