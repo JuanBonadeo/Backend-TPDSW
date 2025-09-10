@@ -43,7 +43,8 @@ export const updateProfileSchema = z.object({
             }
             return date;
         }),
-    image: z.string().url('URL de imagen inválida').optional(),
+    image: z.string().optional(),
+    bio: z.string().max(500, 'La biografía no puede exceder los 500 caracteres').optional()
 });
 
 export type RegisterDto = z.infer<typeof registerSchema>;

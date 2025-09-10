@@ -7,6 +7,8 @@ export const createUserSchema = z.object({
     password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
     name: z.string().min(1, 'El nombre es requerido'),
     birth_date: z.string().datetime().optional().transform((val) => val ? new Date(val) : undefined),
+    bio: z.string().max(500, 'La biografía no puede exceder los 500 caracteres').optional(),
+    image: z.string().url('URL de imagen inválida').optional(),
     role: z.enum(['USER', 'ADMIN', 'MODERATOR'], {
         errorMap: () => ({ message: 'El rol debe ser "USER", "ADMIN" o "MODERATOR"' })
     }).default('USER'),
