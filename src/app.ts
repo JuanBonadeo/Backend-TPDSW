@@ -17,7 +17,7 @@ import cors from "cors";
 const app = express();
 
 // Middleware de logging de requests
-app.use(cors({ origin: "http://localhost:3000" })); // tu frontend
+app.use(cors({ origin: process.env.FRONTEND_URL_PROD })); // tu frontend
 
 
 app.use(express.json());
