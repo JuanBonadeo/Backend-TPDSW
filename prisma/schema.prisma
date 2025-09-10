@@ -95,6 +95,7 @@ model Favorite {
   @@index([id_movie, id_user])
 }
 
+
 model ToWatch {
   id_user    String
   id_movie   Int
