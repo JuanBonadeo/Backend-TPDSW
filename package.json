@@ -6,7 +6,7 @@
     "main": "app.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc -p ./tsconfig.json",
+        "build": "prisma generate && tsc -p ./tsconfig.json",
         "dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
         "seed": "node dist/db/seedTMBd.js",
         "format": "prettier --write .",
