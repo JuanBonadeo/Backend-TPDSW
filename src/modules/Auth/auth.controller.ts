@@ -1,5 +1,6 @@
 // src/modules/auth/auth.controller.ts
 import { Request, Response } from 'express';
+import prisma from '../../db/db.js';
 import { AuthDAO } from './auth.dao.js';
 import { registerSchema, loginSchema, changePasswordSchema, updateProfileSchema } from './auth.dtos.js';
 import { AuthUtils } from '../../utils/auth.js';
@@ -10,7 +11,7 @@ export class AuthController {
     private dao: AuthDAO;
 
     constructor() {
-        this.dao = new AuthDAO();
+        this.dao = new AuthDAO(prisma);
     }
 
     async register(req: Request, res: Response) {
