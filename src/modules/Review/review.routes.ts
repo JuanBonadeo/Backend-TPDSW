@@ -7,6 +7,8 @@ import { AuthMiddleware } from '../../middleware/auth.js';
 export const router = Router();
 const controller = new ReviewController();
 
+router.get('/list', (req: Request, res: Response) => controller.getAllReviewsPaginated(req, res));
+
 router.use(AuthMiddleware.optionalAuth)
 
 router.get('/:id', (req: Request, res: Response) => controller.getOne(req, res));

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ReviewDao } from './review.dao.js';
 import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError, UnauthorizedError } from '../../utils/ErrorHandler.js';
-import { idParamsSchema, idUserParamsSchema, reviewUpdateZodSchema, reviewZodSchema } from './review.dtos.js';
+import { idParamsSchema, idUserParamsSchema, reviewUpdateZodSchema, reviewZodSchema, reviewZodSchemaQuery } from './review.dtos.js';
 
 
 export class ReviewController {
@@ -23,6 +23,9 @@ export class ReviewController {
             return ErrorHandler.handle(error, res);
         }
     }
+
+    
+
     async getReviewsByMovieId(req: Request, res: Response) {
         try {
             const id = idParamsSchema.parse(req.params.id);
@@ -115,4 +118,14 @@ export class ReviewController {
         }
     }
 
+
+    async getAllReviewsPaginated(req: Request, res: Response) {
+        try {
+            const query = reviewZodSchemaQuery.parse(req.query);
+            const result = await this.dao.getAllReviewsPaginated(query);
+            return ResponseHandler.paginated(res, result.reviews, result.pagination.total, result.pagination.currentPage, result.pagination.limit);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
+        }
+    }
 }

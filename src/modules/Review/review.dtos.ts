@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Review } from '@prisma/client';
 
 export const idParamsSchema = z
 .string()
@@ -21,16 +22,28 @@ export const reviewZodSchema = z.object({
     ),
     comment: z.string().max(5000, 'El comentario no puede exceder los 1000 caracteres')
 })
-
+export const reviewZodSchemaQuery = z.object({
+    page: z.coerce.number().int().min(1, 'El número de página debe ser un entero positivo').default(1),
+    limit: z.coerce.number().int().min(1, 'El límite debe ser un entero positivo').max(30, 'El límite máximo permitido es 30').default(10)
+});
 export const reviewUpdateZodSchema = reviewZodSchema.partial()
 
 export type CreateReviewDto = z.infer<typeof reviewZodSchema>;
 export type UpdateReviewDto = z.infer<typeof reviewUpdateZodSchema>;
 export type IdParamsSchema = z.infer<typeof idParamsSchema>;
-
+export type ReviewQueryDto = z.infer<typeof reviewZodSchemaQuery>;
 export interface ReviewData {
     id_user: string;
     id_movie: number;
     score: number;
     comment: string;
+}
+export interface ReviewList {
+    reviews: Review[];
+    pagination: {
+        total: number;
+        currentPage: number;
+        totalPages: number;
+        limit: number;
+    };
 }

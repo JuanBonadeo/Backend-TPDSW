@@ -21,7 +21,7 @@
 
 9. [x] Usar la API de IMDB para cargar toda la data en el seed
  
-10. [ ] CRUD Watched films
+10. [x] CRUD Watched films
 
 ## Manejo de Errores (PULIR)
 
@@ -44,7 +44,7 @@
 
 ## Deploy y Documentación
 
-- [ ] **Deploy backend** funcionando (Railway/Render/Heroku)
+- [x] **Deploy backend** funcionando (Railway/Render/Heroku)
 - [ ] **Swagger/OpenAPI** con todos los endpoints
 - [ ] **Variables de entorno** configuradas (.env dev/prod)
 - [ ] **README.md** con instrucciones de instalación
