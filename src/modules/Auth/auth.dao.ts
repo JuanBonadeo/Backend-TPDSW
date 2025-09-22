@@ -6,13 +6,13 @@ import { RegisterDto, UpdateProfileDto } from './auth.dtos.js';
 export class AuthDAO {
     async findUserByEmail(email: string): Promise<User | null> {
         return await prisma.user.findUnique({
-            where: { email },
+            where: { email, deleted_at: null },
         });
     }
 
     async findUserById(id: string): Promise<User | null> {
         return await prisma.user.findUnique({
-            where: { id },
+            where: { id, deleted_at: null },
             include: { 
                 Favorite: {
                     include: {Movie: true}
@@ -41,14 +41,14 @@ export class AuthDAO {
 
     async updateUser(id: string, userData: UpdateProfileDto): Promise<User | null> {
         return await prisma.user.update({
-            where: { id },
+            where: { id, deleted_at: null },
             data: userData,
         });
     }
 
     async updatePassword(id: string, hashedPassword: string): Promise<void> {
         await prisma.user.update({
-            where: { id },
+            where: { id, deleted_at: null },
             data: { password: hashedPassword },
         });
     }

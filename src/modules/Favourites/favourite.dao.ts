@@ -10,7 +10,7 @@ export class FavouriteDAO {
     
     async getAllByUserId(userId: string): Promise<Favorite[] | null> {
         const favourites = await prisma.favorite.findMany({
-            where: { id_user: userId },
+            where: { id_user: userId, deleted_at: null },
             include: {
                 Movie: {
                     select: {
@@ -33,6 +33,7 @@ export class FavouriteDAO {
     async getOne(favouriteData: FavouriteData): Promise<Favorite | null> {
         const favourite = await prisma.favorite.findUnique({
             where: {
+                deleted_at: null,
                 id_user_id_movie: {
                     id_user: favouriteData.id_user,
                     id_movie: favouriteData.id_movie
@@ -63,9 +64,28 @@ export class FavouriteDAO {
         });
         return newFavourite;
     }
+    async upsert(favouriteData: FavouriteData): Promise<Favorite> {
+        const upsertedFavourite = await prisma.favorite.upsert({
+            where: {
+                id_user_id_movie: {
+                    id_user: favouriteData.id_user,
+                    id_movie: favouriteData.id_movie
+                }
+            },
+            create: {
+                id_user: favouriteData.id_user,
+                id_movie: favouriteData.id_movie
+            },
+            update: {
+                deleted_at: null
+            }
+        });
+        return upsertedFavourite;
+    }
 
     async delete(favouriteData: FavouriteData): Promise<Favorite> {
-        const deletedFavourite = await prisma.favorite.delete({
+        const deletedFavourite = await prisma.favorite.update({
+            data: { deleted_at: new Date() },
             where: {
                 id_user_id_movie: {
                     id_user: favouriteData.id_user,

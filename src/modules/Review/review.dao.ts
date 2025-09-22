@@ -7,7 +7,7 @@ export class ReviewDao {
 
     async getOne(reviewId: number): Promise<Review | null> {
         const result = await prisma.review.findUnique({
-            where: { id_review: reviewId },
+            where: { id_review: reviewId, deleted_at: null },
             include: {
                 User: {
                     select: {
@@ -32,6 +32,7 @@ export class ReviewDao {
         const result = await prisma.review.findMany({
             where: {
                 id_movie: movieId,
+                deleted_at: null
             },
             include: {
                 User: {
@@ -52,7 +53,8 @@ export class ReviewDao {
     async getReviewsByUserId(id_user: string): Promise<Review[] | null> {
         const result = await prisma.review.findMany({
             where: {
-                id_user
+                id_user,
+                deleted_at: null
             },
             include: {
                 Movie: {
@@ -78,15 +80,16 @@ export class ReviewDao {
 
     async update(reviewId: number, reviewData: UpdateReviewDto): Promise<Review | null> {
         const result = await prisma.review.update({
-            where: { id_review: reviewId },
+            where: { id_review: reviewId, deleted_at: null },
             data: reviewData,
         });
         return result;
     }
 
     async delete(reviewId: number): Promise<Review | null> {
-        return await prisma.review.delete({
+        return await prisma.review.update({
             where: { id_review: reviewId },
+            data: { deleted_at: new Date() },
         });
     }
 
@@ -94,6 +97,7 @@ export class ReviewDao {
         const { page, limit } = query;
 
         const reviews = await prisma.review.findMany({
+            where: { deleted_at: null },
             include: {
                 User: {
                     select: {

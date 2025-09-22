@@ -91,57 +91,18 @@ export class UserController {
         } catch (error) {
             return ErrorHandler.handle(error, res);
         }
-    }
+    }   
 
-    async toggleStatus(req: Request, res: Response) {
-        try {
-            const id = userIdParamsSchema.parse(req.params.id);
-            const { isActive } = toggleUserStatusSchema.parse(req.body);
-            const currentUser = req.user!;
-            
-            if (currentUser.userId === id && !isActive) {
-                throw new BadRequestError('No puedes desactivar tu propia cuenta');
-            }
-
-            const updatedUser = await this.dao.toggleStatus(id, isActive);
-            if (!updatedUser) {
-                throw new NotFoundError('Usuario no encontrado');
-            }
-            return ResponseHandler.success(res, updatedUser);
-        } catch (error) {
-            return ErrorHandler.handle(error, res);
-        }
-    }
-
-    async softDelete(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
             const id = userIdParamsSchema.parse(req.params.id);
             const currentUser = req.user!;
             
             if (currentUser.userId === id) {
-                throw new BadRequestError('No puedes eliminar tu propia cuenta');
+                throw new BadRequestError('No puedes eliminar  tu propia cuenta');
             }
 
-            const deletedUser = await this.dao.softDelete(id);
-            if (!deletedUser) {
-                throw new NotFoundError('Usuario no encontrado');
-            }
-            return ResponseHandler.success(res, deletedUser);
-        } catch (error) {
-            return ErrorHandler.handle(error, res);
-        }
-    }
-
-    async hardDelete(req: Request, res: Response) {
-        try {
-            const id = userIdParamsSchema.parse(req.params.id);
-            const currentUser = req.user!;
-            
-            if (currentUser.userId === id) {
-                throw new BadRequestError('No puedes eliminar permanentemente tu propia cuenta');
-            }
-
-            const success = await this.dao.hardDelete(id);
+            const success = await this.dao.delete(id);
             if (!success) {
                 throw new NotFoundError('Usuario no encontrado o no se pudo eliminar');
             }

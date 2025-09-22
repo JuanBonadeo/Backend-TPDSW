@@ -4,13 +4,15 @@ import { CreateCategoryDto, UpdateCategoryDto } from './category.dtos.js';
 
 export class CategoryDAO {
     async getAll(): Promise<Category[] | null> {
-        const categories = await prisma.category.findMany();
+        const categories = await prisma.category.findMany({
+            where: { deleted_at: null }
+        });
         return categories;
     }
 
     async getOne(id: number): Promise<Category | null> {
         const category = await prisma.category.findUnique({
-            where: { id_category: id },
+            where: { id_category: id, deleted_at: null },
         });
         return category;
     }
@@ -27,7 +29,7 @@ export class CategoryDAO {
 
     async update(id: number, updatedCategory: UpdateCategoryDto): Promise<Category | null> {
         const result = await prisma.category.update({
-            where: { id_category: id },
+            where: { id_category: id, deleted_at: null },
             data: {
                 name: updatedCategory.name,
                 description: updatedCategory.description,
@@ -37,8 +39,9 @@ export class CategoryDAO {
     }
 
     async delete(id: number): Promise<Category> {
-        const result = await prisma.category.delete({
-            where: { id_category: id },
+        const result = await prisma.category.update({
+            where: { id_category: id, deleted_at: null },
+            data: { deleted_at: new Date() },
         });
         return result;
     }

@@ -9,7 +9,6 @@ import { router as routerFavourites } from './modules/Favourites/favourite.route
 import { router as routerToWatch } from './modules/ToWatch/toWatch.routes.js';
 import { router as routerReviews } from './modules/Review/review.routes.js';
 import { router as routerUsers } from './modules/Users/user.routes.js';
-import { logger } from './utils/logger.js';
 import { contextMiddleware } from './middleware/contextMiddleware.js';
 import cors from "cors";
 

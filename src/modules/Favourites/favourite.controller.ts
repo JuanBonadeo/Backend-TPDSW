@@ -80,7 +80,7 @@ export class FavouriteController {
                     message: 'Película eliminada de favoritos' 
                 });
             } else {
-                const response = await this.dao.create(favouriteData);
+                const response = await this.dao.upsert(favouriteData);
                 return ResponseHandler.created(res, { 
                     action: 'added',
                     message: 'Película agregada a favoritos',

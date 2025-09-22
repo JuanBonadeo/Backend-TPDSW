@@ -8,40 +8,46 @@ datasource db {
 }
 
 model Movie {
-  id_movie          Int           @id @default(autoincrement())
-  title             String        @unique(map: "Movie_title_idx") @db.VarChar(200)
-  description       String?       @db.VarChar(1000)
+  id_movie          Int      @id @default(autoincrement())
+  title             String   @unique(map: "Movie_title_idx") @db.VarChar(200)
+  description       String?  @db.VarChar(1000)
   duration          Int
   release_date      Int
-  rating            Float?        @default(0)
-  tmdb_id           Int?          @unique
-  poster_path       String?       @db.VarChar(500)
-  backdrop_path     String?       @db.VarChar(500)
-  original_language String?       @db.VarChar(10)
-  vote_count        Int?          @default(0)
-  popularity        Float?        @default(0)
-  adult             Boolean       @default(false)
+  rating            Float?   @default(0)
+  tmdb_id           Int?     @unique
+  poster_path       String?  @db.VarChar(500)
+  backdrop_path     String?  @db.VarChar(500)
+  original_language String?  @db.VarChar(10)
+  vote_count        Int?     @default(0)
+  popularity        Float?   @default(0)
+  adult             Boolean  @default(false)
   id_director       Int
   id_category       Int
-  created_at        DateTime?     @default(now()) @db.Timestamp(6)
-  updated_at        DateTime?     @default(now()) @db.Timestamp(6)
-  averageScore      Decimal?      @db.Decimal(3, 2)
-  totalReviews      Int?          @default(0)
-  Favorite          Favorite[]
-  Category          Category      @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
-  Director          Director      @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
-  Movie_Actor       Movie_Actor[]
-  Review            Review[]
-  ToWatch           ToWatch[]
+  averageScore      Decimal? @db.Decimal(3, 2)
+  totalReviews      Int?     @default(0)
+
+  Favorite    Favorite[]
+  Category    Category      @relation(fields: [id_category], references: [id_category], onDelete: NoAction, onUpdate: NoAction)
+  Director    Director      @relation(fields: [id_director], references: [id_director], onDelete: NoAction, onUpdate: NoAction)
+  Movie_Actor Movie_Actor[]
+  Review      Review[]
+  ToWatch     ToWatch[]
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 }
 
 model Category {
-  id_category Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(50)
+  id_category Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(50)
   description String?
-  tmdb_id     Int?      @unique
-  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  tmdb_id     Int?    @unique
   Movie       Movie[]
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 }
 
 model Director {
@@ -54,8 +60,11 @@ model Director {
   biography    String?
   birth_date   DateTime? @db.Date
   birth_place  String?   @db.VarChar(200)
-  created_at   DateTime? @default(now()) @db.Timestamp(6)
   Movie        Movie[]
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 
   @@unique([first_name, last_name], map: "Director_first_name_last_name_idx")
 }
@@ -70,43 +79,55 @@ model Actor {
   biography    String?
   birth_place  String?       @db.VarChar(200)
   gender       Int?
-  created_at   DateTime?     @default(now()) @db.Timestamp(6)
   Movie_Actor  Movie_Actor[]
+
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 
   @@index([first_name, last_name])
 }
 
 model Favorite {
-  id_user    String
-  id_movie   Int
+  id_user  String
+  id_movie Int
+  Movie    Movie  @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  User     User   @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   created_at DateTime? @default(now()) @db.Timestamp(6)
-  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
-  User       User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 
   @@id([id_user, id_movie])
   @@index([id_movie, id_user])
 }
 
 model ToWatch {
-  id_user    String
-  id_movie   Int
+  id_user  String
+  id_movie Int
+  Movie    Movie  @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  User     User   @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   created_at DateTime? @default(now()) @db.Timestamp(6)
-  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
-  User       User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 
   @@id([id_user, id_movie])
   @@index([id_movie, id_user])
 }
 
 model Movie_Actor {
-  id_movie   Int
-  id_actor   Int
-  role       String?   @db.VarChar(100)
-  character  String?   @db.VarChar(200)
-  order      Int?
+  id_movie  Int
+  id_actor  Int
+  role      String? @db.VarChar(100)
+  character String? @db.VarChar(200)
+  order     Int?
+  Actor     Actor   @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
+  Movie     Movie   @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+
   created_at DateTime? @default(now()) @db.Timestamp(6)
-  Actor      Actor     @relation(fields: [id_actor], references: [id_actor], onDelete: NoAction, onUpdate: NoAction)
-  Movie      Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at DateTime? @db.Timestamp(6)
 
   @@id([id_movie, id_actor])
   @@index([role])
@@ -118,10 +139,12 @@ model Review {
   id_movie    Int
   score       Decimal?  @db.Decimal(3, 2)
   comment     String?
-  review_date DateTime? @default(now()) @db.Timestamp(6)
-  updated_at  DateTime? @default(now()) @db.Timestamp(6)
   Movie       Movie     @relation(fields: [id_movie], references: [id_movie], onDelete: NoAction, onUpdate: NoAction)
   User        User      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  review_date DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  deleted_at  DateTime? @db.Timestamp(6)
 }
 
 model User {
@@ -129,8 +152,6 @@ model User {
   name          String     @db.VarChar(100)
   email         String     @unique(map: "User_email_idx") @db.VarChar(255)
   birth_date    DateTime?  @db.Date
-  created_at    DateTime   @default(now()) @db.Timestamp(6)
-  updated_at    DateTime   @updatedAt @db.Timestamp(6)
   emailVerified Boolean    @default(false)
   image         String?    @default("avatar")
   isActive      Boolean    @default(true)
@@ -141,6 +162,9 @@ model User {
   Review        Review[]
   ToWatch       ToWatch[]
 
+  created_at    DateTime   @default(now()) @db.Timestamp(6)
+  updated_at    DateTime   @updatedAt @db.Timestamp(6)
+  deleted_at    DateTime?  @db.Timestamp(6)
   @@map("user")
 }
 

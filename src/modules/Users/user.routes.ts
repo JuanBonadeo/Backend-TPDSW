@@ -21,8 +21,4 @@ router.get('/', (req: Request, res: Response) => controller.getAll(req, res));
 
 router.post('/', (req: Request, res: Response) => controller.create(req, res));
 
-router.patch('/:id/status', (req: Request, res: Response) => controller.toggleStatus(req, res));
-
-router.delete('/:id', (req: Request, res: Response) => controller.softDelete(req, res));
-
-router.delete('/:id/permanent', (req: Request, res: Response) => controller.hardDelete(req, res));
+router.delete('/:id', (req: Request, res: Response) => controller.delete(req, res));
