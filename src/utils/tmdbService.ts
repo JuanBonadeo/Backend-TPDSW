@@ -250,44 +250,52 @@ export async function fetchAndStoreRecentPopularMovies(limit = 20) {
   
   const data = await fetchTMDB(endpoint);
 
-  // Buscar géneros existentes en la DB
+  // Reutilizar la lógica de la función principal
   const genres = await prisma.category.findMany();
   const created: any[] = [];
-  const skipped: string[] = [];
 
   for (const movie of data.results.slice(0, limit)) {
     const exists = await prisma.movie.findUnique({ where: { tmdb_id: movie.id } });
-    if (exists) {
-      skipped.push(movie.title);
-      continue;
-    }
+    if (exists) continue;
 
     try {
       console.log(`📽️ Procesando: ${movie.title} (Popularidad: ${movie.popularity.toFixed(0)})`);
 
-      // Obtener detalles para runtime y géneros
       const details = await fetchTMDB(`/movie/${movie.id}`);
       const primaryGenre = details.genres?.[0];
       const category = genres.find(g => g.tmdb_id === primaryGenre?.id) || genres[0];
 
-      // Obtener créditos (director y actores)
       const credits = await fetchTMDB(`/movie/${movie.id}/credits`);
-      
-      // Buscar y crear director con todos sus datos
-      const directorPerson = credits.crew.find((p: any) => p.job === "Director");
-      let director;
-      
-      if (directorPerson) {
-        director = await createOrFindDirector(directorPerson);
-      } else {
-        // Fallback a director genérico
-        director = await createOrFindDirector({
-          id: 0,
-          name: 'Director Desconocido',
+      const director = credits.crew.find((p: any) => p.job === "Director");
+      let directorId: number;
+
+      if (director) {
+        const existingDirector = await prisma.director.findUnique({ 
+          where: { tmdb_id: director.id } 
         });
+        
+        if (existingDirector) {
+          directorId = existingDirector.id_director;
+        } else {
+          const nameParts = director.name.split(" ");
+          const d = await prisma.director.create({
+            data: {
+              tmdb_id: director.id,
+              first_name: nameParts[0] || "Desconocido",
+              last_name: nameParts.slice(1).join(" ") || ""
+            }
+          });
+          directorId = d.id_director;
+        }
+      } else {
+        const d = await prisma.director.upsert({
+          where: { tmdb_id: 0 },
+          update: {},
+          create: { tmdb_id: 0, first_name: "Desconocido", last_name: "" }
+        });
+        directorId = d.id_director;
       }
 
-      // Crear película
       const createdMovie = await prisma.movie.create({
         data: {
           title: movie.title,
@@ -302,23 +310,31 @@ export async function fetchAndStoreRecentPopularMovies(limit = 20) {
           vote_count: movie.vote_count,
           popularity: movie.popularity,
           adult: false,
-          id_director: director.id_director,
+          id_director: directorId,
           id_category: category.id_category,
         },
       });
 
-      // Obtener y crear actores principales con todos sus datos (CORREGIDO)
       const mainActors = credits.cast.slice(0, 5);
-      for (const castMember of mainActors) {
-        const actor = await createOrFindActor(castMember);
-        
+      for (const a of mainActors) {
+        const nameParts = a.name.split(" ");
+        const existingActor = await prisma.actor.upsert({
+          where: { tmdb_id: a.id },
+          update: {},
+          create: {
+            tmdb_id: a.id,
+            first_name: nameParts[0] || "Desconocido",
+            last_name: nameParts.slice(1).join(" ") || "",
+          },
+        });
+
         await prisma.movie_Actor.create({
           data: {
             id_movie: createdMovie.id_movie,
-            id_actor: actor.id_actor,
+            id_actor: existingActor.id_actor,
             role: "Actor",
-            character: castMember.character || "",
-            order: castMember.order || 0,
+            character: a.character || "",
+            order: a.order || 0,
           },
         });
       }
@@ -326,7 +342,6 @@ export async function fetchAndStoreRecentPopularMovies(limit = 20) {
       created.push(createdMovie);
       console.log(`✅ Película creada: ${movie.title}`);
 
-      // Pausa para no sobrecargar la API
       await new Promise(resolve => setTimeout(resolve, 250));
 
     } catch (error: any) {
@@ -335,9 +350,6 @@ export async function fetchAndStoreRecentPopularMovies(limit = 20) {
     }
   }
 
-  console.log(`\n📊 Resumen:`);
-  console.log(`✅ Películas recientes y populares creadas: ${created.length}`);
-  console.log(`⏭️ Películas omitidas (ya existían): ${skipped.length}`);
-  
+  console.log(`\n✅ ${created.length} películas recientes y populares creadas`);
   return created;
 }

@@ -1,71 +1,72 @@
 // Agregar validacion de parametros
 import { Request, Response } from 'express';
 import { MovieDAO } from './movie.dao.js';
-import { idParamsSchema, movieZodSchema, movieZodSchemaQuery } from './movie.dtos.js';
+import { idParamsSchema, movieZodSchema, movieZodSchemaQuery, updateMovieZodSchema } from './movie.dtos.js';
 import { ResponseHandler } from '../../utils/responseHandler.js';
 import { ErrorHandler, NotFoundError } from '../../utils/ErrorHandler.js';
+import {  fetchAndStoreRecentPopularMovies } from '../../utils/tmdbService.js';
 
 
 export class MovieController {
-    private dao: MovieDAO;     
+    private dao: MovieDAO;
 
     constructor() {
-        this.dao = new MovieDAO(); 
+        this.dao = new MovieDAO();
     }
 
     async getAll(req: Request, res: Response) {
-            try {
-                const result = await this.dao.getAll();
-                return ResponseHandler.success(res, result);
-            } catch (error) {
-                return ErrorHandler.handle(error, res);
-            }
+        try {
+            const result = await this.dao.getAll();
+            return ResponseHandler.success(res, result);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
         }
-    
-        async getOne(req: Request, res: Response) {
-            try {
-                const id = idParamsSchema.parse(req.params.id);
-                const result = await this.dao.getOne(id);
-    
-                if (!result) {
-                    throw new NotFoundError();
-                }
-                return ResponseHandler.success(res, result);
-            } catch (error) {
-                return ErrorHandler.handle(error, res);
+    }
+
+    async getOne(req: Request, res: Response) {
+        try {
+            const id = idParamsSchema.parse(req.params.id);
+            const result = await this.dao.getOne(id);
+
+            if (!result) {
+                throw new NotFoundError();
             }
+            return ResponseHandler.success(res, result);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
         }
-    
-        async create(req: Request, res: Response) {
-            try {
-                const newMovie = movieZodSchema.parse(req.body);
-                const result = await this.dao.create(newMovie);
-                return ResponseHandler.created(res, result);
-            } catch (error) {
-                return ErrorHandler.handle(error, res);
-            }
+    }
+
+    async create(req: Request, res: Response) {
+        try {
+            const newMovie = movieZodSchema.parse(req.body);
+            const result = await this.dao.create(newMovie);
+            return ResponseHandler.created(res, result);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
         }
-    
-        async update(req: Request, res: Response) {
-            try {
-                const id = idParamsSchema.parse(req.params.id);
-                const updatedData = movieZodSchema.parse(req.body);
-                const result = await this.dao.update(id, updatedData);
-                return ResponseHandler.success(res, result);
-            } catch (error) {
-                return ErrorHandler.handle(error, res);
-            }
+    }
+
+    async update(req: Request, res: Response) {
+        try {
+            const id = idParamsSchema.parse(req.params.id);
+            const updatedData = updateMovieZodSchema.parse(req.body);
+            const result = await this.dao.update(id, updatedData);
+            return ResponseHandler.success(res, result);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
         }
-    
-        async delete(req: Request, res: Response) {
-            try {
-                const id = idParamsSchema.parse(req.params.id);
-                await this.dao.delete(id);
-                return ResponseHandler.deleted(res);
-            } catch (error) {
-                return ErrorHandler.handle(error, res);
-            }
+    }
+
+    async delete(req: Request, res: Response) {
+        try {
+            const id = idParamsSchema.parse(req.params.id);
+            await this.dao.delete(id);
+            return ResponseHandler.deleted(res);
+        } catch (error) {
+            return ErrorHandler.handle(error, res);
         }
+    }
 
     async listMovies(req: Request, res: Response) {
         try {
@@ -82,7 +83,17 @@ export class MovieController {
                 query.limit,
             );
         } catch (error) {
-           return ErrorHandler.handle(error, res);
+            return ErrorHandler.handle(error, res);
+        }
+    }
+
+    async syncWithTMDB(req: Request, res: Response) {
+        try {
+            const movies = await fetchAndStoreRecentPopularMovies(20);
+            return ResponseHandler.created(res, movies, `Se han agregado ${movies.length} películas desde TMDB`);
+        } catch (error: any) {
+            console.error(error);
+            return ErrorHandler.handle(error, res);
         }
     }
 }

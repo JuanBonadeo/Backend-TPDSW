@@ -23,3 +23,6 @@ router.post('/', (req: Request, res: Response) => controller.create(req, res));
 router.patch('/:id', (req: Request, res: Response) => controller.update(req, res));
 
 router.delete('/:id', (req: Request, res: Response) => controller.delete(req, res));
+
+router.post('/seed/latest', (req: Request, res: Response) => controller.syncWithTMDB(req, res));
+
