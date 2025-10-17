@@ -17,7 +17,7 @@
 
 7. [x] CRUD de favoritos
 
-8. [x] CRUD de reseñas @Slashy Osea Yo
+8. [x] CRUD de reseñas
 
 9. [x] Usar la API de IMDB para cargar toda la data en el seed
  
