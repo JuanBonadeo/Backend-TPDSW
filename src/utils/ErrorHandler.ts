@@ -110,15 +110,24 @@ export class ErrorHandler {
 
         // Errores de Zod
         if (error instanceof ZodError) {
+            const issues = error.issues.map(issue => ({
+                field: issue.path.join('.') || 'root',
+                message: issue.message,
+                code: issue.code
+            }));
+
+            // Mensaje principal más útil: si hay un único error, mostrarlo directamente;
+            // si hay varios, concatenar mensajes únicos para una lectura rápida.
+            const uniqueMessages = Array.from(new Set(issues.map(i => i.message)));
+            const primaryMessage = uniqueMessages.length === 1
+                ? uniqueMessages[0]
+                : `Datos de entrada inválidos: ${uniqueMessages.join('; ')}`;
+
             return res.status(400).json({
                 success: false,
-                error: 'Datos de entrada inválidos',
+                error: primaryMessage,
                 code: 'ZOD_VALIDATION_ERROR',
-                details: error.issues.map(issue => ({
-                    field: issue.path.join('.') || 'root',
-                    message: issue.message,
-                    code: issue.code
-                }))
+                details: issues
             });
         }
 

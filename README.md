@@ -1,7 +1,7 @@
 # Critio Backend
 
 ## Descripción general
-Critio Backend es un servicio API REST desarrollado en Node.js que abastece a la plataforma Critio, una aplicación web para la reseña y recomendación de películas y series. El objetivo del proyecto es proveer endpoints seguros y consistentes para la gestión de usuarios, contenidos audiovisuales y sus interacciones. Se extrae toda la información de las peliculas, actores, etc de la [API de TMDB (The Movie Database)](https://www.themoviedb.org/documentation/api) siguiendo su documentación.
+Critio Backend es un servicio API REST desarrollado en Node.js que abastece a la plataforma Critio, una aplicación web para la reseña y recomendación de películas. El objetivo del proyecto es proveer endpoints seguros y consistentes para la gestión de usuarios, contenidos audiovisuales y sus interacciones. Se extrae toda la información de las peliculas, actores, etc de la [API de TMDB (The Movie Database)](https://www.themoviedb.org/documentation/api) siguiendo su documentación.
 
 ## Arquitectura del sistema
 El proyecto adopta una arquitectura modular en capas, organizada alrededor de casos de uso y recursos de dominio.
